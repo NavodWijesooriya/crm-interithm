@@ -1,11 +1,12 @@
-//import Sidebar from "../components/common/Sidebar/Sidebar";
-import  Card  from "../components/common/Card/Card";
 
+import {AppSidebar} from "../components/common/Sidebar/Appsidebar";
 
-export default function Home() {
+import Card from "../components/common/Card/Card";
+
+export default function SidebarPage() {
   return (
     <div>
-      
+      <AppSidebar />  
       <Card />
     </div>
   );

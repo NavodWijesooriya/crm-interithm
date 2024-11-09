@@ -46,12 +46,12 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel className="p-10 text-3xl">Application</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className=" m-2">
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                <SidebarMenuItem className="gap-6" key={item.title}>
+                  <SidebarMenuButton className="text-xl gap-4 text  m-6" asChild>
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>

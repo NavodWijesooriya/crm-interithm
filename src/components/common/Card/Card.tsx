@@ -38,7 +38,7 @@ const Cards = () => {
   const cardDataFinish = [
     {
       title: 'Responsive design',
-      content: 'If a dog chews shoes whose shoes does he choose?',
+      content: 'User cant access mobile version',
       status: 'Finished',
     },
     {
@@ -54,13 +54,12 @@ const Cards = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 p-5 ml-64"> {/* Adjust for sidebar width here */}
-      {/* Todo Section */}
-      <div className="mt-1 mb-8 w-full lg:w-1/3">
+    <div className="flex flex-col lg:flex-row gap-8 p- ml-6"> {/* Adjust for sidebar width */}
+      <div className="mb-8 w-full lg:w-1/3">
         <h1 className="text-xl font-bold mb-4">Todo</h1>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6"> {/* Increased gap between cards */}
           {cardData.map((card, index) => (
-            <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-96 border border-gray-300 mb-4 p-4 rounded-lg">
+            <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-96 border border-gray-300 p-4 rounded-lg">
               <div className="card-body p-4">
                 <h2 className="card-title text-lg font-semibold">{card.title}</h2>
                 <p>{card.content}</p>
@@ -77,12 +76,11 @@ const Cards = () => {
         </div>
       </div>
 
-      {/* Processing Section */}
-      <div className="mt-4 mb-8 w-full lg:w-1/3">
+      <div className="mb-8 w-full lg:w-1/3">
         <h1 className="text-xl font-bold mb-4">Processing</h1>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6"> {/* Increased gap between cards */}
           {cardDataProcess.map((card, index) => (
-            <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-96 border border-gray-300 mb-4 p-4 rounded-lg">
+            <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-96 border border-gray-300 p-4 rounded-lg">
               <div className="card-body p-4">
                 <h2 className="card-title text-lg font-semibold">{card.title}</h2>
                 <p>{card.content}</p>
@@ -99,12 +97,11 @@ const Cards = () => {
         </div>
       </div>
 
-      {/* Finished Section */}
-      <div className="mt-4 mb-8 w-full lg:w-1/3">
+      <div className="mb-8 w-full lg:w-1/3 m-2">
         <h1 className="text-xl font-bold mb-4">Finished</h1>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6"> {/* Increased gap between cards */}
           {cardDataFinish.map((card, index) => (
-            <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-96 border border-gray-300 mb-4 p-4 rounded-lg">
+            <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-96 border border-gray-300 p-4 rounded-lg">
               <div className="card-body p-4">
                 <h2 className="card-title text-lg font-semibold">{card.title}</h2>
                 <p>{card.content}</p>

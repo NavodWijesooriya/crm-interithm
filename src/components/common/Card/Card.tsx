@@ -54,7 +54,7 @@ const Cards = () => {
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 p- ml-6"> {/* Adjust for sidebar width */}
+    <div className="flex flex-col lg:flex-row gap-8 p- ml-20"> {/* Adjust for sidebar width */}
       <div className="mb-8 w-full lg:w-1/3">
         <h1 className="text-xl font-bold mb-4">Todo</h1>
         <div className="flex flex-col gap-6"> {/* Increased gap between cards */}

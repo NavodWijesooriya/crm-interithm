@@ -9,7 +9,7 @@ const Cards = () => {
   const cardData = [
     {
       title: 'Responsive design',
-      content: 'If a dog chews shoes whose shoes does he choose?',
+      content: 'Ensuring users are who they claim to be.',
       status: 'Todo',
     },
     {
@@ -27,7 +27,7 @@ const Cards = () => {
   const cardDataProcess = [
     {
       title: 'Responsive design',
-      content: 'If a dog chews shoes whose shoes does he choose?',
+      content: 'Ensuring users are who they claim to be.',
       status: 'Processing',
     },
     {

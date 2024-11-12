@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
 
@@ -6,12 +6,12 @@ const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [newCard, setNewCard] = useState({ title: '', content: '', status: 'Todo' });
-  const [showForm, setShowForm] = useState(false); // State to show/hide the form modal
+  const [showForm, setShowForm] = useState(false);
 
   const [cardData, setCardData] = useState([
     { title: 'Responsive design', content: 'Ensuring users are who they claim to be and making sure everything is smooth for the user experience on both mobile and desktop views.', status: 'Todo' },
     { title: 'User Authentication', content: 'Ensuring users are who they claim to be by implementing strong authentication methods like OTP or OAuth.', status: 'Todo' },
-    { title: 'API Integration', content: 'Connecting frontend apps to backend services, ensuring the data flow and security between services.', status: 'Todo' },
+    { title: 'API Integration', content: 'Cards pop-up window.', status: 'Todo' },
   ]);
 
   const [cardDataProcess, setCardDataProcess] = useState([
@@ -39,34 +39,18 @@ const Cards = () => {
   const handleAddCard = (e) => {
     e.preventDefault();
     if (newCard.title && newCard.content) {
-      if (newCard.status === 'Todo') {
-        setCardData([...cardData, { ...newCard }]);
-      } else if (newCard.status === 'Processing') {
-        setCardDataProcess([...cardDataProcess, { ...newCard }]);
-      } else if (newCard.status === 'Finished') {
-        setCardDataFinish([...cardDataFinish, { ...newCard }]);
-      }
+      setCardData([...cardData, { ...newCard }]);
       setNewCard({ title: '', content: '', status: 'Todo' });
-      setShowForm(false); // Hide the form after submission
+      setShowForm(false);
     }
   };
 
-  // Function to truncate text
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
   return (
-    <div className="flex flex-col gap-8 m-10">
-      {/* Button to open the form modal */}
-      <button
-        className="flex items-center bg-blue-500 text-white px-4 py-2 rounded mb-4"
-        onClick={() => setShowForm(true)}
-      >
-        <span className="mr-2">+</span> Add New Card
-      </button>
-
-      {/* Add Card Form Modal */}
+    <div className="container mx-auto p-4">
       {showForm && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
@@ -93,8 +77,6 @@ const Cards = () => {
                 onChange={(e) => setNewCard({ ...newCard, status: e.target.value })}
               >
                 <option value="Todo">Todo</option>
-                <option value="Processing">Processing</option>
-                <option value="Finished">Finished</option>
               </select>
               <div className="flex justify-end gap-2">
                 <button
@@ -113,10 +95,9 @@ const Cards = () => {
         </div>
       )}
 
-      {/* Modal for viewing card details */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full md:w-2/3 lg:w-1/2">
             <h2 className="text-xl font-bold mb-4">{selectedCard.title}</h2>
             <p>{selectedCard.content}</p>
             <button className="mt-4 bg-red-500 text-white px-4 py-2 rounded" onClick={closeModal}>
@@ -126,67 +107,45 @@ const Cards = () => {
         </div>
       )}
 
-      {/* Card Sections */}
-      <div className="flex flex-col gap-8">
-        {/* Todo Cards */}
-        <div>
-          <h1 className="text-xl font-bold mb-4">Todo</h1>
-          <div className="flex flex-wrap gap-6">
-            {cardData.map((card, index) => (
-              <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-60 border border-gray-300 p-4 rounded-lg">
-                <div className="card-body">
-                  <h2 className="card-title text-lg font-semibold">{truncateText(card.title, 20)}</h2> {/* Truncate title */}
-                  <p>{truncateText(card.content, 40)}</p> {/* Truncate content */}
-                  <div className="card-actions justify-end">
-                    <button className="btn bg-blue-500 text-white px-4 py-2 rounded" onClick={() => openModal(card)}>
-                      {card.status}
-                    </button>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {[{ title: 'Todo', data: cardData, bgColor: 'bg-blue-500' },
+          { title: 'Processing', data: cardDataProcess, bgColor: 'bg-yellow-500' },
+          { title: 'Finished', data: cardDataFinish, bgColor: 'bg-green-500' }].map((section, idx) => (
+          <div key={idx}>
+            <h1 className="text-xl font-bold mb-4">
+              {section.title}
+              {section.title === 'Todo' && (
+                <button
+                  className="ml-3 bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={() => setShowForm(true)}
+                >
+                  <span className="mr-2">+</span>
+                </button>
+              )}
+            </h1>
+            <div className="flex flex-wrap gap-4 p-4">
+              {section.data.map((card, index) => (
+                <div
+                  key={index}
+                  className="card bg-white shadow-lg text-black w-full sm:w-72 h-80 border border-gray-300 p-6 rounded-lg flex flex-col justify-between"
+                >
+                  <div className="card-body">
+                    <h2 className="card-title text-lg font-semibold">{truncateText(card.title, 20)}</h2>
+                    <p className="flex-1 overflow-hidden">{truncateText(card.content, 60)}</p>
+                    <div className="card-actions justify-end">
+                      <button
+                        className={`btn ${section.bgColor} text-white px-4 py-2 rounded`}
+                        onClick={() => openModal(card)}
+                      >
+                        {card.status}
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-
-        {/* Processing Cards */}
-        <div>
-          <h1 className="text-xl font-bold mb-4">Processing</h1>
-          <div className="flex flex-wrap gap-6">
-            {cardDataProcess.map((card, index) => (
-              <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-60 border border-gray-300 p-4 rounded-lg">
-                <div className="card-body">
-                  <h2 className="card-title text-lg font-semibold">{truncateText(card.title, 20)}</h2> {/* Truncate title */}
-                  <p>{truncateText(card.content, 40)}</p> {/* Truncate content */}
-                  <div className="card-actions justify-end">
-                    <button className="btn bg-yellow-500 text-white px-4 py-2 rounded" onClick={() => openModal(card)}>
-                      {card.status}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Finished Cards */}
-        <div>
-          <h1 className="text-xl font-bold mb-4">Finished</h1>
-          <div className="flex flex-wrap gap-6">
-            {cardDataFinish.map((card, index) => (
-              <div key={index} className="card bg-white shadow-lg text-black-content w-full lg:w-60 border border-gray-300 p-4 rounded-lg">
-                <div className="card-body">
-                  <h2 className="card-title text-lg font-semibold">{truncateText(card.title, 20)}</h2> {/* Truncate title */}
-                  <p>{truncateText(card.content, 40)}</p> {/* Truncate content */}
-                  <div className="card-actions justify-end">
-                    <button className="btn bg-green-500 text-white px-4 py-2 rounded" onClick={() => openModal(card)}>
-                      {card.status}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

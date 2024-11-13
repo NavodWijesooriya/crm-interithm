@@ -28,7 +28,7 @@ const Cards = () => {
   ]);
 
   // Modal handlers
-  const openModal = (card:any) => {
+  const openModal = (card) => {
     setSelectedCard(card);
     setIsModalOpen(true);
   };
@@ -39,7 +39,7 @@ const Cards = () => {
   };
 
   // Handle adding a new card
-  const handleAddCard = (e:any) => {
+  const handleAddCard = (e) => {
     e.preventDefault();
     if (newCard.title && newCard.content) {
       setCardData([...cardData, { ...newCard }]);
@@ -48,12 +48,12 @@ const Cards = () => {
     }
   };
 
-  const truncateText = (text: any, maxLength:any) => {
+  const truncateText = (text, maxLength) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
 
-  // Card style classes for consistent styling with reduced width and fixed height
-  const cardStyle = "flex flex-col justify-between p-4 bg-white shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200 max-w-xs mx-auto h-64"; // Fixed height
+  // Responsive card style classes
+  const cardStyle = "flex flex-col justify-between p-4 bg-white shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200 h-60"; // Fixed height
 
   return (
     <div className="container mx-auto p-4">
@@ -96,7 +96,7 @@ const Cards = () => {
       )}
 
       {/* Main Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {[{ title: 'Todo', data: cardData, bgColor: 'bg-blue-500' },
           { title: 'Processing', data: cardDataProcess, bgColor: 'bg-yellow-500' },
           { title: 'Finished', data: cardDataFinish, bgColor: 'bg-green-500' }].map((section, idx) => (
@@ -117,12 +117,12 @@ const Cards = () => {
 
             {/* Card List */}
             {section.data.map((card, index) => (
-              <div key={index} className={cardStyle}>
+              <div key={index} className={`${cardStyle} md:max-w-xs`}>
                 <h3 className="text-lg font-semibold">{truncateText(card.title, 20)}</h3>
                 <p className="text-gray-600 overflow-auto">{truncateText(card.content, 60)}</p>
                 <button
                   onClick={() => openModal(card)}
-                  className={`${section.bgColor} text-white py-1 px-2 text-sm rounded mt-2 ml-auto`} // Smaller button and aligned to the right
+                  className={`${section.bgColor} text-white py-1 px-2 text-sm rounded mt-2 ml-auto`}
                 >
                   View
                 </button>

@@ -2,7 +2,8 @@ import React from 'react';
 
 const Login = () => {
   return (
-    <section className="text-gray-600 body-font h-screen flex justify-center items-center bg-gradient-to-r from-indigo-500 bg-white">
+    <div className='bg-white'>
+    <section className="text-gray-600 body-font h-screen flex justify-center items-center bg-white">
       <div className="container px-5 py-24 mx-auto flex flex-wrap items-center justify-center">
         <div className="lg:w-2/6 md:w-1/2 bg-white rounded-lg p-8 flex flex-col w-full shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl">
           <h2 className="text-gray-900 text-2xl font-bold text-center mb-6">Login</h2>
@@ -38,6 +39,7 @@ const Login = () => {
         </div>
       </div>
     </section>
+    </div>
   );
 }
 

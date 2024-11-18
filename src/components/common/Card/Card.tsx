@@ -1,12 +1,26 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth'
+import {auth} from '@/app/firebase/config'
+import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth'
 
 const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
   const [newCard, setNewCard] = useState({ title: '', content: '', status: 'Todo' });
   const [showForm, setShowForm] = useState(false);
+
+  const [user] = useAuthState(auth);
+  const router = useRouter()
+  const userSession = sessionStorage.getItem('user')
+
+  console.log({user})
+
+if (!user && !userSession) {
+  router.push('/sign-up')
+}
 
   // Card data for Todo, Processing, and Finished
   const [cardData, setCardData] = useState([
@@ -66,6 +80,11 @@ const Cards = () => {
 
   return (
     <div className="container mx-auto p-4">
+
+      <button onClick={() => {
+        
+        signOut(auth)
+        sessionStorage.removeItem('user')}}>Log out</button>
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">

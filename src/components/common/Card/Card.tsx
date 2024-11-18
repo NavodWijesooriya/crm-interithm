@@ -48,6 +48,15 @@ const Cards = () => {
     }
   };
 
+  // const handleSeleteCard = (e) => {
+  //   e.preventDefault();
+  //   if (newCard.title && newCard.content) {
+  //     setCardData([...cardData, { ...newCard }]);
+  //     setNewCard({ title: '', content: '', status: 'Todo' });
+  //     setShowForm(false);
+  //   }
+  // };
+
   const truncateText = (text, maxLength) => {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
@@ -85,6 +94,7 @@ const Cards = () => {
       )}
 
       {/* Card Detail Modal */}
+      
       {isModalOpen && selectedCard && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">

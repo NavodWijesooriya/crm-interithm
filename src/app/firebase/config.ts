@@ -1,6 +1,9 @@
+// Import Firebase modules
 import { initializeApp, getApps, getApp } from "firebase/app";
-import {getAuth} from 'firebase/auth'
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
+// Your Firebase configuration
 const firebaseConfig = {
     apiKey: "AIzaSyC4VKUDfOQN71YlWiZGepNZpccp9aPnvm4",
     authDomain: "crm-interithm-c1315.firebaseapp.com",
@@ -10,8 +13,10 @@ const firebaseConfig = {
     appId: "1:399268060754:web:b118b6391d13f0631f098b"
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp()
+// Initialize Firebase app (singleton pattern)
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-const auth = getAuth(app)
-
-export {app, auth}
+// Export services
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export default app;

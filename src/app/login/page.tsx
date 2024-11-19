@@ -54,7 +54,7 @@ const Login = () => {
             />
           </div>
 
-          <button onClick={handleSignUp} className="text-white bg-indigo-600 hover:bg-indigo-700 border-0 py-2 px-6 focus:outline-none rounded-md text-lg w-full mb-4 transform transition duration-300 hover:scale-105">
+          <button onClick={handleSignUp()} className="text-white bg-indigo-600 hover:bg-indigo-700 border-0 py-2 px-6 focus:outline-none rounded-md text-lg w-full mb-4 transform transition duration-300 hover:scale-105">
             Login
           </button>
 

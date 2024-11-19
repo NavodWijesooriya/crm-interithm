@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth'
 import {auth} from '@/app/firebase/config'
 import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth'
+// import { signOut } from 'firebase/auth'
 
 const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +34,7 @@ if (!user && !userSession) {
     { title: 'Payment Gateway', content: 'Integrate secure payment APIs.', status: 'Processing' },
   ]);
 
-  const [cardDataFinish, setCardDataFinish] = useState([
+  const [cardDataFinish,] = useState([
     { title: 'Frontend Setup', content: 'React and Tailwind CSS setup completed.', status: 'Finished' },
     { title: 'Unit Tests', content: 'All components tested successfully.', status: 'Finished' },
     { title: 'Deployment', content: 'Project successfully deployed.', status: 'Finished' },
@@ -69,24 +69,7 @@ if (!user && !userSession) {
   return (
     <div className="container mx-auto p-4">
 
-     <div className='text-black flex align-right justify-end'>
-     <button onClick={() => {
-    signOut(auth)
-      .then(() => {
-        sessionStorage.removeItem('user');
-        router.push('/sign-in');
-      })
-      .catch((error) => {
-        console.error('Error during sign out:', error);
-      });
-  }}
->
-  Log out
-</button>
-
-   
-     </div>
-
+    
       {showForm && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">

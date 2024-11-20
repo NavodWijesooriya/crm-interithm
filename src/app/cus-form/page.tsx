@@ -29,19 +29,30 @@ const formSchema = z.object({
     message: "Please enter a valid email address.",
   }),
 
-    // phoneNumber: z
-    // .string()
-    // .regex(/^\+?[1-9]\d{1,14}$/, {
-    //   message: "Enter a valid phone number (e.g., +123456789).",
-    // }),
-    
+
+  /* 
+    phoneNumber: z
+      .string()
+      .regex(/^\+?[1-9]\d{1,14}$/, {
+        message: "Enter a valid phone number (e.g., +123456789).",
+      }),
+  */
+
   complainCategory: z.string().min(1, {
     message: "Complain category is required.",
   }),
+
   description: z.string().min(5, {
     message: "Description must be at least 5 characters long.",
   }),
+
+  // status: z.string().min(1, {
+  //   //message: "Description must be at least 5 characters long.",
+  // }),
+
 });
+
+
 
 const Page = () => {
   const form = useForm({
@@ -53,16 +64,17 @@ const Page = () => {
       phoneNumber: "",
       complainCategory: "",
       description: "",
+      // status: "TODO"
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data) => {
     try {
-
+      console.log(data)
       const docRef = await addDoc(collection(db, "customer_issues"), data);
       console.log("Document written with ID: ", docRef.id);
-      //alert("Form submitted successfully!");
-      console.log('Form submitted successfully');
+      alert("Form submitted successfully!");
+      // console.log('Form submitted successfully');
 
 
       form.reset();
@@ -204,6 +216,24 @@ const Page = () => {
               </FormItem>
             )}
           />
+
+          {/* <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-lg font-medium text-gray-800">Status</FormLabel>
+                <FormControl>
+                  <Input
+                    className="border-2 border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-500 transition-colors duration-300"
+                    // placeholder=""
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-sm text-red-600" />
+              </FormItem>
+            )}
+          /> */}
 
 
           <div className="flex justify-center w-full">

@@ -1,54 +1,75 @@
-'use client'
 
-import { useState } from 'react';
-import {useCreateUserWithEmailAndPassword} from 'react-firebase-hooks/auth'
-import {auth} from '@/app/firebase/config'
 
-const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
+// 'use client'
+// import { useState } from 'react';
+// import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth'
+// import { auth } from '@/app/firebase/config'
 
-  const handleSignUp = async () => {
-    try {
-        const res = await createUserWithEmailAndPassword(email, password)
-        console.log({res})
-        sessionStorage.setItem('user', true)
-        setEmail('');
-        setPassword('')
+// const SignUp = () => {
+//   const [email, setEmail] = useState('');
+//   const [password, setPassword] = useState('');
+//   const [createUserWithEmailAndPassword] = useCreateUserWithEmailAndPassword(auth);
 
-    } catch(e){
-        console.error(e)
-    }
-  };
+//   const handleSignUp = async () => {
+//     try {
+//       const res = await createUserWithEmailAndPassword(email, password)
+//       console.log({ res })
+//       sessionStorage.setItem('user', 'true')
+//       setEmail('');
+//       setPassword('')
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
-      <div className="bg-gray-800 p-10 rounded-lg shadow-xl w-96">
-        <h1 className="text-white text-2xl mb-5">Sign Up</h1>
-        <input 
-          type="email" 
-          placeholder="Email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
-          className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password} 
-          onChange={(e) => setPassword(e.target.value)} 
-          className="w-full p-3 mb-4 bg-gray-700 rounded outline-none text-white placeholder-gray-500"
-        />
-        <button 
-          onClick={handleSignUp}
-          className="w-full p-3 bg-indigo-600 rounded text-white hover:bg-indigo-500"
-        >
-          Sign Up
-        </button>
-      </div>
-    </div>
-  );
-};
+//     } catch (e) {
+//       console.error(e)
+//     }
+//   };
 
-export default SignUp;
+//   return (
+//     <div className='bg-white'>
+//       <section className="text-gray-600 body-font h-screen flex justify-center items-center bg-white">
+//         <div className="container px-5 py-24 mx-auto flex flex-wrap items-center justify-center">
+//           <div className="lg:w-2/6 md:w-1/2 bg-white rounded-lg p-8 flex flex-col w-full shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+//             <h2 className="text-gray-900 text-2xl font-bold text-center mb-6">Sign Up</h2>
+
+//             <div className="relative mb-4">
+//               <label htmlFor="email" className="leading-7 text-sm text-gray-600">E-mail</label>
+//               <input
+//                 type="email"
+//                 id="email"
+//                 name="email"
+//                 value={email}
+//                 onChange={(e) => setEmail(e.target.value)}
+//                 className="w-full bg-gray-100 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 text-base outline-none text-gray-700 py-2 px-4 transition-colors duration-200 ease-in-out"
+//               />
+//             </div>
+
+//             <div className="relative mb-6">
+//               <label htmlFor="password" className="leading-7 text-sm text-gray-600">Password</label>
+//               <input
+//                 type="password"
+//                 id="password"
+//                 name="password"
+//                 value={password}
+//                 onChange={(e) => setPassword(e.target.value)}
+//                 className="w-full bg-gray-100 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-300 text-base outline-none text-gray-700 py-2 px-4 transition-colors duration-200 ease-in-out"
+//               />
+//             </div>
+
+//             <button
+//               onClick={handleSignUp}
+//               className="text-white bg-indigo-600 hover:bg-indigo-700 border-0 py-2 px-6 focus:outline-none rounded-md text-lg w-full mb-4 transform transition duration-300 hover:scale-105"
+//             >
+//               Sign Up
+//             </button>
+
+//             <p className="text-xs text-center text-gray-500">
+
+//               <a href="/sign-in" className="text-indigo-500 hover:text-indigo-700">Sign In</a>
+//             </p>
+//           </div>
+//         </div>
+//       </section>
+//     </div>
+//   );
+// };
+
+// export default SignUp;

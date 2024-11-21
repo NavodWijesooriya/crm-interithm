@@ -1,146 +1,267 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
+import { db } from "@/app/firebase/config";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  updateDoc,
+  doc,
+  serverTimestamp,
+  addDoc,
+} from "firebase/firestore";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/app/firebase/config";
+import { useRouter } from "next/navigation";
 
 const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [newCard, setNewCard] = useState({ title: '', content: '', status: 'Todo' });
-  const [showForm, setShowForm] = useState(false);
+  const [todoCardData, setTodoCardData] = useState([]);
+  const [processingCardData, setProcessingCardData] = useState([]);
+  const [doneCardData, setDoneCardData] = useState([]);
+  const [user, loading] = useAuthState(auth);
+  const [showMoreTodo, setShowMoreTodo] = useState(false);
+  const [showMoreProcessing, setShowMoreProcessing] = useState(false);
+  const router = useRouter();
 
-  // Card data for Todo, Processing, and Finished
-  const [cardData, setCardData] = useState([
-    { title: 'Responsive Design', content: 'Improve mobile and desktop UX.', status: 'Todo' },
-    { title: 'User Authentication', content: 'Implement secure login.', status: 'Todo' },
-    { title: 'API Integration', content: 'Integrate frontend with backend services.', status: 'Todo' },
-  ]);
+  useEffect(() => {
+    if (!loading && !user && !sessionStorage.getItem("user")) {
+      router.push("/sign-in");
+    }
+  }, [user, loading, router]);
 
-  const [cardDataProcess, setCardDataProcess] = useState([
-    { title: 'UI Testing', content: 'Ensure all components are responsive.', status: 'Processing' },
-    { title: 'OAuth Implementation', content: 'Set up OAuth for secure login.', status: 'Processing' },
-    { title: 'Payment Gateway', content: 'Integrate secure payment APIs.', status: 'Processing' },
-  ]);
+  useEffect(() => {
+    const q = query(collection(db, "customer_issues"), where("status", "==", "TODO"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const cards = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setTodoCardData(cards);
+    });
 
-  const [cardDataFinish, setCardDataFinish] = useState([
-    { title: 'Frontend Setup', content: 'React and Tailwind CSS setup completed.', status: 'Finished' },
-    { title: 'Unit Tests', content: 'All components tested successfully.', status: 'Finished' },
-    { title: 'Deployment', content: 'Project successfully deployed.', status: 'Finished' },
-  ]);
+    return () => unsubscribe();
+  }, []);
 
-  // Modal handlers
+  useEffect(() => {
+    const q = query(collection(db, "customer_issues"), where("status", "==", "processing"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const cards = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProcessingCardData(cards);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const q = query(collection(db, "customer_issues"), where("status", "==", "done"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const cards = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setDoneCardData(cards);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const openModal = (card) => {
     setSelectedCard(card);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
     setSelectedCard(null);
+    setIsModalOpen(false);
   };
 
-  // Handle adding a new card
-  const handleAddCard = (e) => {
-    e.preventDefault();
-    if (newCard.title && newCard.content) {
-      setCardData([...cardData, { ...newCard }]);
-      setNewCard({ title: '', content: '', status: 'Todo' });
-      setShowForm(false);
+  const handleAssignAndMoveToProcessing = async (card) => {
+    if (!user) return alert("You must be logged in to assign the task.");
+
+    const cardRef = doc(db, "customer_issues", card.id);
+
+    try {
+      await updateDoc(cardRef, {
+        assignedTo: user.email,
+        assignedTime: serverTimestamp(),
+        status: "processing",
+        lastUpdated: serverTimestamp(),
+        assignedBy: user.email,
+      });
+
+      await addDoc(collection(db, "customer_issues"), {
+        issueId: card.id,
+        companyName: card.companyName,
+        complainCategory: card.complainCategory,
+        customerName: card.customerName,
+        description: card.description,
+        email: card.email,
+        assignedBy: user.email,
+        assignedAt: serverTimestamp(),
+        assignedUserDetails: {
+          uid: user.uid,
+        },
+      });
+
+      alert("Task has been assigned and moved to processing!");
+    } catch (error) {
+      console.error("Error assigning task:", error);
+      alert("There was an error assigning and moving the task to processing.");
     }
   };
 
-  // const handleSeleteCard = (e) => {
-  //   e.preventDefault();
-  //   if (newCard.title && newCard.content) {
-  //     setCardData([...cardData, { ...newCard }]);
-  //     setNewCard({ title: '', content: '', status: 'Todo' });
-  //     setShowForm(false);
-  //   }
-  // };
+  const handleMoveToDone = async (card) => {
+    if (!user) return alert("You must be logged in to move the task to done.");
 
-  const truncateText = (text, maxLength) => {
-    return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+    const cardRef = doc(db, "customer_issues", card.id);
+
+    try {
+      await updateDoc(cardRef, {
+        status: "done",
+        doneTime: serverTimestamp(),
+        doneBy: user.email,
+        doneUserDetails: {
+          uid: user.uid,
+        },
+        lastUpdated: serverTimestamp(),
+      });
+
+      // Update state by removing card from processing and adding it to done
+      setProcessingCardData((prevData) =>
+        prevData.filter((item) => item.id !== card.id)
+      );
+      setDoneCardData((prevData) => [...prevData, card]);
+
+      alert("Task has been moved to Done!");
+    } catch (error) {
+      console.error("Error moving task to Done:", error);
+      alert("There was an error moving the task to Done.");
+    }
   };
 
-  // Responsive card style classes
-  const cardStyle = "flex flex-col justify-between p-4 bg-white shadow-lg rounded-lg border border-gray-200 hover:shadow-xl transition-shadow duration-200 h-60"; // Fixed height
-
   return (
-    <div className="container mx-auto p-4">
-      {/* Form Modal */}
-      {showForm && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add a New Card</h2>
-            <form onSubmit={handleAddCard} className="flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Title"
-                className="p-2 border rounded"
-                value={newCard.title}
-                onChange={(e) => setNewCard({ ...newCard, title: e.target.value })}
-                required
-              />
-              <textarea
-                placeholder="Content"
-                className="p-2 border rounded"
-                value={newCard.content}
-                onChange={(e) => setNewCard({ ...newCard, content: e.target.value })}
-                required
-              />
-              <button type="submit" className="bg-blue-500 text-white py-2 rounded">Add Card</button>
-            </form>
+    <div>
+      {/* To-Do, Processing, and Done Cards Layout */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {/* To-Do Section */}
+        <div>
+          <div className="text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b-4 border-blue-500 pb-2 flex items-center justify-between bg-gray-100 px-4 rounded-lg shadow-md">
+            <span>To-Do</span>
           </div>
-        </div>
-      )}
 
-      {/* Card Detail Modal */}
-      
-      {isModalOpen && selectedCard && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-lg">
-            <h2 className="text-xl font-bold mb-4">{selectedCard.title}</h2>
-            <p>{selectedCard.content}</p>
-            <button className="mt-4 bg-red-500 text-white py-2 rounded" onClick={closeModal}>Close</button>
+          <div className="grid gap-4">
+            {todoCardData.slice(0, showMoreTodo ? todoCardData.length : 4).map((card, index) => (
+              <div
+                key={`${card.id}-${index}`} // Ensure uniqueness by combining the ID with the index
+                className="bg-white p-2 shadow-lg rounded-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                <h3 className="text-sm font-semibold text-blue-600">{card.customerName}</h3>
+                <p className="text-sm text-gray-600 mt-2">{card.description}</p>
+                <p className="mt-2 text-xs text-gray-500">Status: {card.status}</p>
+                <div className="mt-4 flex space-x-2">
+                  <button
+                    className="bg-green-500 text-white py-1 px-2 rounded transition-all duration-200 transform hover:scale-105"
+                    onClick={() => handleAssignAndMoveToProcessing(card)}
+                  >
+                    Move to Processing
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white py-1 px-2 rounded transition-all duration-200 transform hover:scale-105"
+                    onClick={() => openModal(card)}
+                  >
+                    View
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
+          <button
+            className="text-blue-500 mt-4"
+            onClick={() => setShowMoreTodo((prev) => !prev)}
+          >
+            {showMoreTodo ? "Show Less" : "Show More"}
+          </button>
         </div>
-      )}
 
-      {/* Main Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {[{ title: 'Todo', data: cardData, bgColor: 'bg-blue-500' },
-          { title: 'Processing', data: cardDataProcess, bgColor: 'bg-yellow-500' },
-          { title: 'Finished', data: cardDataFinish, bgColor: 'bg-green-500' }].map((section, idx) => (
-          <div key={idx} className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className={`text-lg font-semibold ${section.bgColor} text-white p-2 rounded`}>
-                {section.title}
-              </h2>
-              {section.title === 'Todo' && (
+        {/* Processing Section */}
+        <div>
+          <div className="text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b-4 border-blue-500 pb-2 flex items-center justify-between bg-gray-100 px-4 rounded-lg shadow-md">
+            <span>Processing</span>
+          </div>
+
+          <div className="grid gap-4">
+            {processingCardData.slice(0, showMoreProcessing ? processingCardData.length : 4).map((card, index) => (
+              <div
+                key={`${card.id}-${index}`} // Ensure uniqueness by combining the ID with the index
+                className="bg-white p-2 shadow-lg rounded-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                <h3 className="text-sm font-semibold text-blue-600">{card.customerName}</h3>
+                <p className="text-sm text-gray-600 mt-2">{card.description}</p>
+                <p className="mt-2 text-xs text-gray-500">Status: {card.status}</p>
                 <button
-                  onClick={() => setShowForm(true)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded "
+                  className="bg-blue-500 text-white py-1 px-2 rounded mt-4 transition-all duration-200 transform hover:scale-105"
+                  onClick={() => handleMoveToDone(card)}
                 >
-                  + Add
+                  Move to Done
                 </button>
-              )}
-            </div>
-
-            {/* Card List */}
-            {section.data.map((card, index) => (
-              <div key={index} className={`${cardStyle} md:max-w-xs`}>
-                <h3 className="text-lg font-semibold">{truncateText(card.title, 20)}</h3>
-                <p className="text-gray-600 overflow-auto">{truncateText(card.content, 60)}</p>
                 <button
+                  className="bg-blue-500 text-white py-1 px-2 rounded mt-4 transition-all duration-200 transform hover:scale-105"
                   onClick={() => openModal(card)}
-                  className={`${section.bgColor} text-white py-1 px-2 text-sm rounded mt-2 ml-auto`}
                 >
                   View
                 </button>
               </div>
             ))}
           </div>
-        ))}
+          <button
+            className="text-blue-500 mt-4"
+            onClick={() => setShowMoreProcessing((prev) => !prev)}
+          >
+            {showMoreProcessing ? "Show Less" : "Show More"}
+          </button>
+        </div>
+
+        {/* Done Section */}
+        <div>
+          <div className="text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b-4 border-blue-500 pb-2 flex items-center justify-between bg-gray-100 px-4 rounded-lg shadow-md gap-10">
+            <span>Done</span>
+          </div>
+
+          <div className="grid gap-4">
+            {doneCardData.map((card, index) => (
+              <div
+                key={`${card.id}-${index}`} // Ensure uniqueness by combining the ID with the index
+                className="bg-white p-2 shadow-lg rounded-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+              >
+                <h3 className="text-sm font-semibold text-blue-600">{card.customerName}</h3>
+                <p className="text-sm text-gray-600 mt-2">{card.description}</p>
+                <p className="mt-2 text-xs text-gray-500">Status: {card.status}</p>
+                <button
+                  className="bg-blue-500 text-white py-1 px-2 rounded mt-4 transition-all duration-200 transform hover:scale-105"
+                  onClick={() => openModal(card)}
+                >
+                  View
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {/* Modal */}
+      {isModalOpen && selectedCard && (
+        <div className="modal">
+          {/* Your modal content goes here */}
+          <button onClick={closeModal}>Close</button>
+        </div>
+      )}
     </div>
   );
 };

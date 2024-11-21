@@ -28,31 +28,14 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-
-
-  /* 
-    phoneNumber: z
-      .string()
-      .regex(/^\+?[1-9]\d{1,14}$/, {
-        message: "Enter a valid phone number (e.g., +123456789).",
-      }),
-  */
-
   complainCategory: z.string().min(1, {
     message: "Complain category is required.",
   }),
-
   description: z.string().min(5, {
     message: "Description must be at least 5 characters long.",
   }),
-
-  // status: z.string().min(1, {
-  //   //message: "Description must be at least 5 characters long.",
-  // }),
-
+  status: z.string().default("TODO"), // Default status is "TODO"
 });
-
-
 
 const Page = () => {
   const form = useForm({
@@ -61,22 +44,18 @@ const Page = () => {
       customerName: "",
       companyName: "",
       email: "",
-      phoneNumber: "",
       complainCategory: "",
       description: "",
-      // status: "TODO"
+      status: "TODO", // Default status value
     },
   });
 
   const onSubmit = async (data) => {
     try {
-      console.log(data)
+      console.log(data);
       const docRef = await addDoc(collection(db, "customer_issues"), data);
       console.log("Document written with ID: ", docRef.id);
       alert("Form submitted successfully!");
-      // console.log('Form submitted successfully');
-
-
       form.reset();
     } catch (error) {
       console.error("Error adding document: ", error);
@@ -97,7 +76,7 @@ const Page = () => {
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-
+          {/* Customer Name */}
           <FormField
             control={form.control}
             name="customerName"
@@ -116,7 +95,7 @@ const Page = () => {
             )}
           />
 
-
+          {/* Company Name */}
           <FormField
             control={form.control}
             name="companyName"
@@ -135,7 +114,7 @@ const Page = () => {
             )}
           />
 
-
+          {/* Email */}
           <FormField
             control={form.control}
             name="email"
@@ -154,27 +133,7 @@ const Page = () => {
             )}
           />
 
-
-          <FormField
-            control={form.control}
-            name="phoneNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-lg font-medium text-gray-800">Phone Number</FormLabel>
-                <FormControl>
-                  <Input
-                    type=""
-                    className="border-2 border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-500 transition-colors duration-300"
-                    placeholder="Enter your phone number"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-sm text-red-600" />
-              </FormItem>
-            )}
-          />
-
-
+          {/* Complain Category */}
           <FormField
             control={form.control}
             name="complainCategory"
@@ -198,7 +157,7 @@ const Page = () => {
             )}
           />
 
-
+          {/* Description */}
           <FormField
             control={form.control}
             name="description"
@@ -217,25 +176,7 @@ const Page = () => {
             )}
           />
 
-          {/* <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-lg font-medium text-gray-800">Status</FormLabel>
-                <FormControl>
-                  <Input
-                    className="border-2 border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-500 transition-colors duration-300"
-                    // placeholder=""
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-sm text-red-600" />
-              </FormItem>
-            )}
-          /> */}
-
-
+          {/* Submit Button */}
           <div className="flex justify-center w-full">
             <Button
               type="submit"

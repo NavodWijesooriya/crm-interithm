@@ -20,7 +20,7 @@ const SignIn = () => {
         setPassword('');
         router.push('/');
       }
-    } catch (e: any) {
+    } catch (e) {
       if (e.code === 'auth/user-not-found') {
         console.error('User not found. Redirecting to Sign Up.');
         alert('User not found! Redirecting to Sign Up page.');

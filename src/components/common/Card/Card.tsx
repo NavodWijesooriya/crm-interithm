@@ -79,7 +79,7 @@ const Cards = () => {
         <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
         <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
       </div>
-      <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
         <button
           onClick={() => actionHandler(card)}
           className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition"
@@ -99,7 +99,6 @@ const Cards = () => {
   return (
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-     
         <div>
           <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
           {todoCardData.map((card) =>
@@ -114,7 +113,6 @@ const Cards = () => {
           )}
         </div>
 
-       
         <div>
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
           {doneCardData.map((card) => (
@@ -126,7 +124,7 @@ const Cards = () => {
                 <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
                 <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
               </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
                 <button
                   onClick={() => handleMove(card, "done")}
                   className="bg-gray-400 text-white px-4 py-2 text-sm rounded-lg cursor-not-allowed"
@@ -146,7 +144,6 @@ const Cards = () => {
         </div>
       </div>
 
- 
       {isModalOpen && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 shadow-2xl max-w-lg w-full">

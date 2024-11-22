@@ -133,7 +133,6 @@ const Cards = () => {
         lastUpdated: serverTimestamp(),
       });
 
-      // Update state by removing card from processing and adding it to done
       setProcessingCardData((prevData) =>
         prevData.filter((item) => item.id !== card.id)
       );
@@ -147,33 +146,29 @@ const Cards = () => {
   };
 
   return (
-    <div>
-      {/* To-Do, Processing, and Done Cards Layout */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="container mx-auto p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* To-Do Section */}
-        <div>
-          <div className="text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b-4 border-blue-500 pb-2 flex items-center justify-between bg-gray-100 px-4 rounded-lg shadow-md">
-            <span>To-Do</span>
-          </div>
-
-          <div className="grid gap-4">
-            {todoCardData.slice(0, showMoreTodo ? todoCardData.length : 4).map((card, index) => (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-blue-600">To-Do</h2>
+          <div className="space-y-4">
+            {todoCardData.slice(0, showMoreTodo ? todoCardData.length : 6).map((card) => (
               <div
-                key={`${card.id}-${index}`} // Ensure uniqueness by combining the ID with the index
-                className="bg-white p-2 shadow-lg rounded-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                key={card.id}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
               >
-                <h3 className="text-sm font-semibold text-blue-600">{card.customerName}</h3>
+                <h3 className="text-lg font-semibold text-gray-800">{card.customerName}</h3>
                 <p className="text-sm text-gray-600 mt-2">{card.description}</p>
-                <p className="mt-2 text-xs text-gray-500">Status: {card.status}</p>
-                <div className="mt-4 flex space-x-2">
+                <p className="text-xs text-gray-500 mt-1">Status: {card.status}</p>
+                <div className="mt-4 flex justify-between">
                   <button
-                    className="bg-green-500 text-white py-1 px-2 rounded transition-all duration-200 transform hover:scale-105"
+                    className="bg-green-500 text-white px-4 py-2 rounded"
                     onClick={() => handleAssignAndMoveToProcessing(card)}
                   >
                     Move to Processing
                   </button>
                   <button
-                    className="bg-blue-500 text-white py-1 px-2 rounded transition-all duration-200 transform hover:scale-105"
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
                     onClick={() => openModal(card)}
                   >
                     View
@@ -183,7 +178,7 @@ const Cards = () => {
             ))}
           </div>
           <button
-            className="text-blue-500 mt-4"
+            className="text-blue-500 underline"
             onClick={() => setShowMoreTodo((prev) => !prev)}
           >
             {showMoreTodo ? "Show Less" : "Show More"}
@@ -191,37 +186,36 @@ const Cards = () => {
         </div>
 
         {/* Processing Section */}
-        <div>
-          <div className="text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b-4 border-blue-500 pb-2 flex items-center justify-between bg-gray-100 px-4 rounded-lg shadow-md">
-            <span>Processing</span>
-          </div>
-
-          <div className="grid gap-4">
-            {processingCardData.slice(0, showMoreProcessing ? processingCardData.length : 4).map((card, index) => (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-blue-600">Processing</h2>
+          <div className="space-y-4">
+            {processingCardData.slice(0, showMoreProcessing ? processingCardData.length : 6).map((card) => (
               <div
-                key={`${card.id}-${index}`} // Ensure uniqueness by combining the ID with the index
-                className="bg-white p-2 shadow-lg rounded-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                key={card.id}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
               >
-                <h3 className="text-sm font-semibold text-blue-600">{card.customerName}</h3>
+                <h3 className="text-lg font-semibold text-gray-800">{card.customerName}</h3>
                 <p className="text-sm text-gray-600 mt-2">{card.description}</p>
-                <p className="mt-2 text-xs text-gray-500">Status: {card.status}</p>
-                <button
-                  className="bg-blue-500 text-white py-1 px-2 rounded mt-4 transition-all duration-200 transform hover:scale-105"
-                  onClick={() => handleMoveToDone(card)}
-                >
-                  Move to Done
-                </button>
-                <button
-                  className="bg-blue-500 text-white py-1 px-2 rounded mt-4 transition-all duration-200 transform hover:scale-105"
-                  onClick={() => openModal(card)}
-                >
-                  View
-                </button>
+                <p className="text-xs text-gray-500 mt-1">Status: {card.status}</p>
+                <div className="mt-4 flex justify-between">
+                  <button
+                    className="bg-green-500 text-white px-4 py-2 rounded"
+                    onClick={() => handleMoveToDone(card)}
+                  >
+                    Move to Done
+                  </button>
+                  <button
+                    className="bg-blue-500 text-white px-4 py-2 rounded"
+                    onClick={() => openModal(card)}
+                  >
+                    View
+                  </button>
+                </div>
               </div>
             ))}
           </div>
           <button
-            className="text-blue-500 mt-4"
+            className="text-blue-500 underline"
             onClick={() => setShowMoreProcessing((prev) => !prev)}
           >
             {showMoreProcessing ? "Show Less" : "Show More"}
@@ -229,22 +223,19 @@ const Cards = () => {
         </div>
 
         {/* Done Section */}
-        <div>
-          <div className="text-2xl font-semibold mt-8 mb-4 text-gray-800 border-b-4 border-blue-500 pb-2 flex items-center justify-between bg-gray-100 px-4 rounded-lg shadow-md gap-10">
-            <span>Done</span>
-          </div>
-
-          <div className="grid gap-4">
-            {doneCardData.map((card, index) => (
+        <div className="space-y-4">
+          <h2 className="text-2xl font-semibold text-blue-600">Done</h2>
+          <div className="space-y-4">
+            {doneCardData.map((card) => (
               <div
-                key={`${card.id}-${index}`} // Ensure uniqueness by combining the ID with the index
-                className="bg-white p-2 shadow-lg rounded-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105"
+                key={card.id}
+                className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-transform transform hover:scale-105"
               >
-                <h3 className="text-sm font-semibold text-blue-600">{card.customerName}</h3>
+                <h3 className="text-lg font-semibold text-gray-800">{card.customerName}</h3>
                 <p className="text-sm text-gray-600 mt-2">{card.description}</p>
-                <p className="mt-2 text-xs text-gray-500">Status: {card.status}</p>
+                <p className="text-xs text-gray-500 mt-1">Status: {card.status}</p>
                 <button
-                  className="bg-blue-500 text-white py-1 px-2 rounded mt-4 transition-all duration-200 transform hover:scale-105"
+                  className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
                   onClick={() => openModal(card)}
                 >
                   View
@@ -257,9 +248,17 @@ const Cards = () => {
 
       {/* Modal */}
       {isModalOpen && selectedCard && (
-        <div className="modal">
-          {/* Your modal content goes here */}
-          <button onClick={closeModal}>Close</button>
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold">{selectedCard.customerName}</h3>
+            <p className="mt-2">{selectedCard.description}</p>
+            <button
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+              onClick={closeModal}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>

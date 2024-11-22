@@ -14,8 +14,19 @@ export default function SidebarPage() {
   const userSession = sessionStorage.getItem('user')
   return (
     <div>
-      <div className='text-black flex align-right justify-end m-10'>
-        <button onClick={() => {
+
+
+      <div>
+      <div className="text-3xl sm:text-5xl lg:text-6xl font-extrabold mb-6 text-center  text-blue-600 tracking-wide drop-shadow-md">
+      <h1>
+  Customer Issues Tracker
+</h1>
+
+
+</div>
+
+<div className='text-black flex align-right justify-end m-10'>
+        <button  onClick={() => {
           signOut(auth)
             .then(() => {
               sessionStorage.removeItem('user');
@@ -28,6 +39,11 @@ export default function SidebarPage() {
         >
           Log out
         </button>
+        </div>
+
+        
+
+        
         {/* 
 <div className="text-black flex align-left justify-end m-5">
 <h1 className="flex  justify-self-start">Todo</h1>

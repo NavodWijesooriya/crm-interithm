@@ -28,6 +28,11 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
+  mobileNumber: z
+    .string()
+    // .regex(/^\d+$/, { message: "Mobile number must be numeric." })
+    .min(10, { message: "Mobile number must be at least 10 digits." })
+    .max(15, { message: "Mobile number must not exceed 15 digits." }),
   complainCategory: z.string().min(1, {
     message: "Complain category is required.",
   }),
@@ -44,6 +49,7 @@ const Page = () => {
       customerName: "",
       companyName: "",
       email: "",
+      mobileNumber: "", // Default value for mobile number
       complainCategory: "",
       description: "",
       status: "TODO", // Default status value
@@ -133,6 +139,25 @@ const Page = () => {
             )}
           />
 
+          {/* Mobile Number */}
+          <FormField
+            control={form.control}
+            name="mobileNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-lg font-medium text-gray-800">Mobile Number</FormLabel>
+                <FormControl>
+                  <Input
+                    className="border-2 border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-500 transition-colors duration-300"
+                    placeholder="Enter your mobile number"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage className="text-sm text-red-600" />
+              </FormItem>
+            )}
+          />
+
           {/* Complain Category */}
           <FormField
             control={form.control}
@@ -146,8 +171,8 @@ const Page = () => {
                     className="border-2 border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-500 transition-colors duration-300"
                   >
                     <option value="">Select a category</option>
-                    <option value="product">System error</option>
-                    <option value="service">Add more features</option>
+                    <option value="system error">System error</option>
+                    <option value="add more features">Add more features</option>
                     <option value="billing">Billing</option>
                     <option value="other">Other</option>
                   </select>

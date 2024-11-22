@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
 import { db, auth } from "@/app/firebase/config";
 import {
@@ -16,14 +14,10 @@ import { useRouter } from "next/navigation";
 
 const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isTodoModalOpen, setIsTodoModalOpen] = useState(false); // State for To-Do card modal
   const [selectedCard, setSelectedCard] = useState(null);
   const [todoCardData, setTodoCardData] = useState([]);
   const [processingCardData, setProcessingCardData] = useState([]);
   const [doneCardData, setDoneCardData] = useState([]);
-  const [showMoreTodo, setShowMoreTodo] = useState(false);
-  const [showMoreProcessing, setShowMoreProcessing] = useState(false);
-  const [showMoreDone, setShowMoreDone] = useState(false);
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
 
@@ -53,15 +47,9 @@ const Cards = () => {
     setIsModalOpen(true);
   };
 
-  const openTodoModal = (card) => {
-    setSelectedCard(card);
-    setIsTodoModalOpen(true); // Open the To-Do modal
-  };
-
   const closeModal = () => {
     setSelectedCard(null);
     setIsModalOpen(false);
-    setIsTodoModalOpen(false); // Close To-Do modal as well
   };
 
   const handleMove = async (card, status) => {
@@ -82,25 +70,27 @@ const Cards = () => {
     }
   };
 
-  const renderCard = (card, actionLabel, actionHandler, additionalActionLabel, additionalActionHandler) => (
+  const renderCard = (card, actionLabel, actionHandler) => (
     <div
       key={card.id}
-      className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all transform hover:scale-105"
+      className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all transform hover:scale-105"
     >
-      <h3 className="text-lg font-semibold text-gray-800">{card.customerName}</h3>
-      <p className="text-gray-600 mt-2">{card.description}</p>
-      <div className="mt-4 flex justify-between">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
+        <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
+      </div>
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
         <button
           onClick={() => actionHandler(card)}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+          className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition"
         >
           {actionLabel}
         </button>
         <button
-          onClick={() => additionalActionHandler(card)}
-          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+          onClick={() => openModal(card)}
+          className="bg-green-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-700 transition"
         >
-          {additionalActionLabel}
+          View Details
         </button>
       </div>
     </div>
@@ -109,94 +99,73 @@ const Cards = () => {
   return (
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {/* To-Do Section */}
+     
         <div>
           <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
-          {todoCardData.slice(0, showMoreTodo ? todoCardData.length : 6).map((card) =>
-            renderCard(
-              card,
-              "=>", // Label for Move button
-              (c) => handleMove(c, "processing"), // Move to processing handler
-              "View", // Label for View Details button
-              (c) => openTodoModal(c) // Open customer details modal
-            )
+          {todoCardData.map((card) =>
+            renderCard(card, "=>", (c) => handleMove(c, "processing"))
           )}
-          <button
-            onClick={() => setShowMoreTodo((prev) => !prev)}
-            className="mt-4 text-blue-500 font-medium hover:underline"
-          >
-            {showMoreTodo ? "Show Less" : "Show More"}
-          </button>
         </div>
 
-        {/* Processing Section */}
         <div>
-          <h2 className="text-2xl font-semibold text-blue-600 mb-6">Processing</h2>
-          {processingCardData.slice(0, showMoreProcessing ? processingCardData.length : 6).map((card) =>
+          <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
+          {processingCardData.map((card) =>
             renderCard(card, "=>", (c) => handleMove(c, "done"))
           )}
-          <buttonqwe123qqwe
-            onClick={() => setShowMoreProcessing((prev) => !prev)}
-            className="mt-4 text-blue-500 font-medium hover:underline"
-          >
-            {showMoreProcessing ? "Show Less" : "Show More"}
-          </button>
         </div>
 
-        {/* Done Section */}
+       
         <div>
-          <h2 className="text-2xl font-semibold text-blue-600 mb-6">Done</h2>
-          {doneCardData.slice(0, showMoreDone ? doneCardData.length : 6).map((card) =>
-            renderCard(card, "Details", openModal)
-          )}
-          <button
-            onClick={() => setShowMoreDone((prev) => !prev)}
-            className="mt-4 text-blue-500 font-medium hover:underline"
-          >
-            {showMoreDone ? "Show Less" : "Show More"}
-          </button>
+          <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
+          {doneCardData.map((card) => (
+            <div
+              key={card.id}
+              className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all transform hover:scale-105"
+            >
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
+                <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
+              </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between gap-1">
+                <button
+                  onClick={() => handleMove(card, "done")}
+                  className="bg-gray-400 text-white px-4 py-2 text-sm rounded-lg cursor-not-allowed"
+                  disabled
+                >
+                  Done
+                </button>
+                <button
+                  onClick={() => openModal(card)}
+                  className="bg-green-600 text-white px-4 py-1 text-sm rounded-lg hover:bg-green-700 transition"
+                >
+                  View Details
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
-      {/* To-Do Modal */}
-      {isTodoModalOpen && selectedCard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 shadow-2xl max-w-lg w-full">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-              {selectedCard.customerName}
-            </h3>
-            <p className="text-gray-600 mb-6">{selectedCard.description}</p>
-            <div className="mb-4">
-              <label htmlFor="additionalDetails" className="block text-gray-700 font-medium">
-                Add Details:
-              </label>
-              <textarea
-                id="additionalDetails"
-                rows="4"
-                className="w-full p-3 border border-gray-300 rounded-lg mt-2"
-                placeholder="Enter additional details..."
-              ></textarea>
-            </div>
-            <div className="flex justify-end">
-              <button
-                onClick={closeModal}
-                className="bg-gray-300 px-6 py-3 rounded-lg hover:bg-gray-400 transition"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Modal (for Done cards or others) */}
+ 
       {isModalOpen && selectedCard && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 shadow-2xl max-w-lg w-full">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-4">
-              {selectedCard.customerName}
-            </h3>
-            <p className="text-gray-600 mb-6">{selectedCard.description}</p>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-4">{selectedCard.customerName}</h3>
+            <p className="text-gray-600 mb-4">
+              <strong>Company Name:</strong> {selectedCard.companyName}
+            </p>
+            <p className="text-gray-600 mb-4">
+              <strong>Email:</strong> {selectedCard.email}
+            </p>
+            <p className="text-gray-600 mb-4">
+              <strong>Mobile Number:</strong> {selectedCard.mobileNumber}
+            </p>
+            <p className="text-gray-600 mb-4">
+              <strong>Category:</strong> {selectedCard.complainCategory}
+            </p>
+            <p className="text-gray-600 mb-4">
+              <strong>Description:</strong> {selectedCard.description}
+            </p>
             <button
               onClick={closeModal}
               className="bg-gray-300 px-6 py-3 rounded-lg hover:bg-gray-400 transition"

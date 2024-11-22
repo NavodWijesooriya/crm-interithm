@@ -4,20 +4,20 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Card from "../components/common/Card/Card";
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { auth } from '@/app/firebase/config'
-import { useRouter } from 'next/navigation';
-import { signOut } from 'firebase/auth'
+// import { useRouter } from 'next/navigation';
+// import { signOut } from 'firebase/auth'
 
 export default function SidebarPage() {
 
-  const [user] = useAuthState(auth);
-  const router = useRouter()
-  const userSession = sessionStorage.getItem('user')
+  // const [user] = useAuthState(auth);
+  // const router = useRouter()
+  // const userSession = sessionStorage.getItem('user')
   return (
     <div>
 
 
       <div>
-      <div className="text-3xl sm:text-5xl lg:text-6xl font-extrabold mb-6 text-center  text-blue-600 tracking-wide drop-shadow-md">
+      <div className="text-xl sm:text-5xl lg:text-6xl font-extrabold mb-6 text-center  text-blue-600 tracking-wide drop-shadow-md p-10 m-10">
       <h1>
   Customer Issues Tracker
 </h1>
@@ -25,7 +25,7 @@ export default function SidebarPage() {
 
 </div>
 
-<div className='text-black flex align-right justify-end m-10'>
+{/* <div className='text-black flex align-right justify-end m-10'>
         <button  onClick={() => {
           signOut(auth)
             .then(() => {
@@ -41,7 +41,7 @@ export default function SidebarPage() {
         </button>
         </div>
 
-        
+         */}
 
         
         {/* 

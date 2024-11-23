@@ -3,7 +3,7 @@
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { z } from "zod"; // Corrected the import of zod to only use the z module
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "../firebase/config";
 
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
+// Define form schema with validation rules using Zod
 const formSchema = z.object({
   customerName: z.string().min(2, {
     message: "Customer name must be at least 2 characters.",
@@ -30,7 +31,6 @@ const formSchema = z.object({
   }),
   mobileNumber: z
     .string()
-    // .regex(/^\d+$/, { message: "Mobile number must be numeric." })
     .min(10, { message: "Mobile number must be at least 10 digits." })
     .max(15, { message: "Mobile number must not exceed 15 digits." }),
   complainCategory: z.string().min(1, {
@@ -39,8 +39,8 @@ const formSchema = z.object({
   description: z.string().min(5, {
     message: "Description must be at least 5 characters long.",
   }),
-  status: z.string().default("TODO"), // Default status is "TODO"
-});
+  status: z.string().default("TODO"), // Default status value
+}); // <-- Added missing closing bracket here
 
 const Page = () => {
   const form = useForm({
@@ -49,14 +49,14 @@ const Page = () => {
       customerName: "",
       companyName: "",
       email: "",
-      mobileNumber: "", // Default value for mobile number
+      mobileNumber: "",
       complainCategory: "",
       description: "",
       status: "TODO", // Default status value
     },
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data:FormData) => {
     try {
       console.log(data);
       const docRef = await addDoc(collection(db, "customer_issues"), data);

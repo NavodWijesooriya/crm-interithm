@@ -92,7 +92,7 @@ const Cards = () => {
         lastUpdated: serverTimestamp(),
         [`${status}By`]: user.email,
       });
-      alert(`Task moved to ${status}!`);
+      // alert(`Task moved to ${status}!`);
     } catch (error) {
       console.error(`Error moving task to ${status}:`, error);
       alert(`Error moving task to ${status}.`);

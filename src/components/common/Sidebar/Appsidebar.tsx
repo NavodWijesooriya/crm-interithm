@@ -46,28 +46,35 @@ const items = [
 export function AppSidebar() {
   const router = useRouter();
   return (
-    <Sidebar className="h-screen bg-black text-black">
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="p-10 text-3xl text-black"></SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu className="m-2">
-              {items.map((item) => (
-                <SidebarMenuItem className="gap-6" key={item.title}>
-                  <SidebarMenuButton className="text-xl gap-4 m-6 text-black hover:text-black transition" asChild>
-                    <a href={item.url} className="flex items-center gap-4">
-                      <item.icon className="text-gray-400" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
+    <Sidebar className="h-screen bg-gray-900 text-black">
+      <SidebarContent className="flex flex-col justify-between h-full">
+       
+        <div>
+          <SidebarGroup>
+            <SidebarGroupLabel className="p-10 text-3xl text-black">
    
-        <div className="flex items-center justify-center h-full">
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="m-2">
+                {items.map((item) => (
+                  <SidebarMenuItem className="gap-6" key={item.title}>
+                    <SidebarMenuButton
+                      className="text-xl gap-4 m-6 text-black hover:text-black transition"
+                      asChild
+                    >
+                      <a href={item.url} className="flex items-center gap-4">
+                        <item.icon className="text-gray-400" />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
+
+        <div className="mb-6 flex justify-center">
           <button
             className="bg-red-500 text-white text-xl px-4 py-2 rounded-lg hover:bg-red-600 transition"
             onClick={() => {

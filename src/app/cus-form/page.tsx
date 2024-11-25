@@ -2,7 +2,7 @@
 
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form"; // Import SubmitHandler
+import { useForm, SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-// Define the validation schema using zod
+
 const formSchema = z.object({
   customerName: z.string().min(2, {
     message: "Customer name must be at least 2 characters.",
@@ -42,7 +42,7 @@ const formSchema = z.object({
   // }),
 });
 
-// Define a type for the form data
+
 type FormData = {
   customerName: string;
   companyName: string;
@@ -65,20 +65,20 @@ const Page = () => {
     },
   });
 
-  // Handle form submission
+
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      // Add status field to the form data (initial status is "TODO")
+
       const docRef = await addDoc(collection(db, "customer_issues"), {
         ...data,
-        status: "TODO", // Setting initial status
-        createdAt: serverTimestamp(), // Adding timestamp
+        status: "TODO", 
+        createdAt: serverTimestamp(), 
       });
       console.log("Document written with ID: ", docRef.id);
-      // Optionally alert the user that the form was submitted
+      
       console.log("Form submitted successfully");
 
-      form.reset(); // Reset the form after submission
+      form.reset(); 
     } catch (error) {
       console.error("Error adding document: ", error);
       alert("Error submitting form. Please try again.");
@@ -86,7 +86,7 @@ const Page = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-2xl bg-gradient-to-r from-white via-white to-white rounded-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-transform duration-300 ease-in-out">
+    <div className="container mx-auto p-6 max-w-2xl bg-gradient-to-r from-white via-white to-white rounded-lg shadow-xl hover:shadow-2xl hover:scale-100 transition-transform duration-300 ease-in-out">
       <div className="text-center mb-10">
         <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400 leading-tight shadow-md">
           Customer Issue Form

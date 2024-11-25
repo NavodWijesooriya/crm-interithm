@@ -32,6 +32,11 @@ const Cards = () => {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
 
+  // States to handle showing more or less cards
+  const [showMoreTodo, setShowMoreTodo] = useState(false);
+  const [showMoreProcessing, setShowMoreProcessing] = useState(false);
+  const [showMoreDone, setShowMoreDone] = useState(false);
+
   useEffect(() => {
     if (!loading && !user && !sessionStorage.getItem("user")) {
       router.push("/sign-in");
@@ -101,13 +106,13 @@ const Cards = () => {
   ) => (
     <div
       key={card.id}
-      className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-100 gap-5"
+      className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all transform hover:scale-100 mb-8 border border-gray-300"
     >
       <div>
         <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
         <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
       </div>
-      <div className="flex flex-col sm:flex-row sm:justify-between gap- mt-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
         <button
           onClick={() => actionHandler(card)}
           className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition"
@@ -124,29 +129,63 @@ const Cards = () => {
     </div>
   );
 
+  // Limit the data to 4 cards only
+  const todoCardsToDisplay = showMoreTodo ? todoCardData : todoCardData.slice(0, 3);
+  const processingCardsToDisplay = showMoreProcessing ? processingCardData : processingCardData.slice(0, 3);
+  const doneCardsToDisplay = showMoreDone ? doneCardData : doneCardData.slice(0, 3);
+
   return (
     <div className="container mx-auto p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8">
+        
+        {/* To-Do Section */}
+        <div className="border border-gray-300 rounded-lg p-12">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
-          {todoCardData.map((card) =>
+          {todoCardsToDisplay.map((card) =>
             renderCard(card, "Move", (c) => handleMove(c, "processing"))
           )}
+          {todoCardData.length > 4 && (
+            <button
+              onClick={() => setShowMoreTodo(!showMoreTodo)}
+              className="text-blue-600 mt-4"
+            >
+              {showMoreTodo ? "Show Less" : "Show More"}
+            </button>
+          )}
         </div>
 
-        <div>
+        {/* Processing Section */}
+        <div className="border border-gray-300 rounded-lg p-12">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
-          {processingCardData.map((card) =>
+          {processingCardsToDisplay.map((card) =>
             renderCard(card, "Move", (c) => handleMove(c, "done"))
           )}
-        </div>
-
-        <div>
-          <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
-          {doneCardData.map((card) =>
-            renderCard(card, "View", openModal)
+          {processingCardData.length > 4 && (
+            <button
+              onClick={() => setShowMoreProcessing(!showMoreProcessing)}
+              className="text-blue-600 mt-4"
+            >
+              {showMoreProcessing ? "Show Less" : "Show More"}
+            </button>
           )}
         </div>
+
+        {/* Done Section */}
+        <div className="border border-gray-300 rounded-lg p-12">
+          <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
+          {doneCardsToDisplay.map((card) =>
+            renderCard(card, "View", openModal)
+          )}
+          {doneCardData.length > 4 && (
+            <button
+              onClick={() => setShowMoreDone(!showMoreDone)}
+              className="text-blue-600 mt-4"
+            >
+              {showMoreDone ? "Show Less" : "Show More"}
+            </button>
+          )}
+        </div>
+
       </div>
 
       {isModalOpen && selectedCard && (

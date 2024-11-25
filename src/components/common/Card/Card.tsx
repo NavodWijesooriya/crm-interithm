@@ -101,13 +101,13 @@ const Cards = () => {
   ) => (
     <div
       key={card.id}
-      className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all transform hover:scale-105"
+      className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-100 gap-5"
     >
       <div>
         <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
         <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
       </div>
-      <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between gap- mt-4">
         <button
           onClick={() => actionHandler(card)}
           className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition"

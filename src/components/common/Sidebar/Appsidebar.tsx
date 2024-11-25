@@ -46,8 +46,9 @@ const items = [
 export function AppSidebar() {
   const router = useRouter();
   return (
-    <Sidebar className="h-screen">
-      <SidebarContent>
+    <div className=" bg-black">
+    <Sidebar className="h-screen ">
+      <SidebarContent >
         <SidebarGroup>
           <SidebarGroupLabel className="p-10 text-3xl"></SidebarGroupLabel>
           <SidebarGroupContent>
@@ -66,7 +67,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Logout Button Centered */}
         <div className="flex items-center justify-center h-full">
           <button
             className="text-black text-2xl px-4 py-2 rounded-lg hover:bg-gray-200 transition"
@@ -86,5 +86,6 @@ export function AppSidebar() {
         </div>
       </SidebarContent>
     </Sidebar>
+    </div>
   );
 }

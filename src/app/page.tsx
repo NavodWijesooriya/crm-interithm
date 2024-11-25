@@ -1,4 +1,6 @@
 'use client'
+
+
 import { AppSidebar } from "../components/common/Sidebar/Appsidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Card from "../components/common/Card/Card";
@@ -17,7 +19,7 @@ export default function SidebarPage() {
 
 
       <div>
-      <div className="text-xl sm:text-5xl lg:text-6xl font-extrabold mb-6 text-center  text-blue-600 tracking-wide drop-shadow-md p-10 m-10">
+      <div className="text-xl sm:text-5xl lg:text-5xl font-extrabold mb-6 text-center  text-blue-600 tracking-wide drop-shadow-md p-3 m-3 font-roboto">
       <h1>
   Customer Issues Tracker
 </h1>

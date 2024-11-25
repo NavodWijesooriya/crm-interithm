@@ -2,7 +2,7 @@
 
 import React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form"; // Import SubmitHandler
 import { z } from "zod";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-
+// Define the validation schema using zod
 const formSchema = z.object({
   customerName: z.string().min(2, {
     message: "Customer name must be at least 2 characters.",
@@ -37,13 +37,23 @@ const formSchema = z.object({
   complainCategory: z.string().min(1, {
     message: "Complain category is required.",
   }),
-  description: z.string().min(5, {
-    message: "Description must be at least 5 characters long.",
-  }),
+  // description: z.string().min(2, {
+  //   message: "Description must be at least 5 characters long.",
+  // }),
 });
 
+// Define a type for the form data
+type FormData = {
+  customerName: string;
+  companyName: string;
+  email: string;
+  phoneNumber: string;
+  complainCategory: string;
+  description: string;
+};
+
 const Page = () => {
-  const form = useForm({
+  const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       customerName: "",
@@ -55,20 +65,20 @@ const Page = () => {
     },
   });
 
-  
-  const onSubmit = async (data: any) => {
+  // Handle form submission
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      
+      // Add status field to the form data (initial status is "TODO")
       const docRef = await addDoc(collection(db, "customer_issues"), {
         ...data,
-        status: "TODO", 
-        createdAt: serverTimestamp(),
+        status: "TODO", // Setting initial status
+        createdAt: serverTimestamp(), // Adding timestamp
       });
       console.log("Document written with ID: ", docRef.id);
- 
+      // Optionally alert the user that the form was submitted
       console.log("Form submitted successfully");
 
-      form.reset(); 
+      form.reset(); // Reset the form after submission
     } catch (error) {
       console.error("Error adding document: ", error);
       alert("Error submitting form. Please try again.");
@@ -182,8 +192,8 @@ const Page = () => {
                     className="border-2 border-gray-300 rounded-md p-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 hover:border-blue-500 transition-colors duration-300"
                   >
                     <option value="">Select a category</option>
-                    <option value="product">System error</option>
-                    <option value="service">Add more features</option>
+                    <option value="system error">System error</option>
+                    <option value="add more features">Add more features</option>
                     <option value="billing">Billing</option>
                     <option value="other">Other</option>
                   </select>
@@ -228,4 +238,3 @@ const Page = () => {
 };
 
 export default Page;
-

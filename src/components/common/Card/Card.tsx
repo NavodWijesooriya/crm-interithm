@@ -130,14 +130,14 @@ const Cards = () => {
         <div>
           <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
           {todoCardData.map((card) =>
-            renderCard(card, "Move to Processing", (c) => handleMove(c, "processing"))
+            renderCard(card, "Move", (c) => handleMove(c, "processing"))
           )}
         </div>
 
         <div>
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
           {processingCardData.map((card) =>
-            renderCard(card, "Move to Done", (c) => handleMove(c, "done"))
+            renderCard(card, "Move", (c) => handleMove(c, "done"))
           )}
         </div>
 

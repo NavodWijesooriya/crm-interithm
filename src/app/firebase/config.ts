@@ -5,12 +5,12 @@ import { getAuth } from "firebase/auth";
 
 // Your Firebase configuration
 const firebaseConfig = {
-    apiKey: "AIzaSyC4VKUDfOQN71YlWiZGepNZpccp9aPnvm4",
-    authDomain: "crm-interithm-c1315.firebaseapp.com",
-    projectId: "crm-interithm-c1315",
-    storageBucket: "crm-interithm-c1315.firebasestorage.app",
-    messagingSenderId: "399268060754",
-    appId: "1:399268060754:web:b118b6391d13f0631f098b"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
 // Initialize Firebase app (singleton pattern)

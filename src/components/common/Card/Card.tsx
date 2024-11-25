@@ -32,7 +32,7 @@ const Cards = () => {
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
 
-  // States to handle showing more or less cards
+  
   const [showMoreTodo, setShowMoreTodo] = useState(false);
   const [showMoreProcessing, setShowMoreProcessing] = useState(false);
   const [showMoreDone, setShowMoreDone] = useState(false);
@@ -129,7 +129,7 @@ const Cards = () => {
     </div>
   );
 
-  // Limit the data to 4 cards only
+  
   const todoCardsToDisplay = showMoreTodo ? todoCardData : todoCardData.slice(0, 3);
   const processingCardsToDisplay = showMoreProcessing ? processingCardData : processingCardData.slice(0, 3);
   const doneCardsToDisplay = showMoreDone ? doneCardData : doneCardData.slice(0, 3);
@@ -138,8 +138,9 @@ const Cards = () => {
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8">
         
-        {/* To-Do Section */}
-        <div className="border border-gray-300 rounded-lg p-12">
+       
+      <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
+
           <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
           {todoCardsToDisplay.map((card) =>
             renderCard(card, "Move", (c) => handleMove(c, "processing"))
@@ -154,8 +155,9 @@ const Cards = () => {
           )}
         </div>
 
-        {/* Processing Section */}
-        <div className="border border-gray-300 rounded-lg p-12">
+        
+        <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
+
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
           {processingCardsToDisplay.map((card) =>
             renderCard(card, "Move", (c) => handleMove(c, "done"))
@@ -170,8 +172,10 @@ const Cards = () => {
           )}
         </div>
 
-        {/* Done Section */}
-        <div className="border border-gray-300 rounded-lg p-12">
+        
+        <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
+
+
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
           {doneCardsToDisplay.map((card) =>
             renderCard(card, "View", openModal)

@@ -51,7 +51,7 @@ export function AppSidebar() {
        
         <div>
           <SidebarGroup>
-            <SidebarGroupLabel className="p-10 text-3xl text-black">
+            <SidebarGroupLabel className="p-5 text-3xl text-black">
    
             </SidebarGroupLabel>
             <SidebarGroupContent>

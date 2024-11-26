@@ -29,17 +29,17 @@ const formSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  // phoneNumber: z
-  //   .string()
-  //   .regex(/^\+?[1-9]\d{1,14}$/, {
-  //     message: "Enter a valid phone number (e.g., +123456789).",
-  //   }),
+  phoneNumber: z
+    .string()
+    .regex(/^\+?[0-9]{1,14}$/, {
+      message: "Enter a valid phone number.",
+    }),
   complainCategory: z.string().min(1, {
     message: "Complain category is required.",
   }),
-  // description: z.string().min(2, {
-  //   message: "Description must be at least 5 characters long.",
-  // }),
+  description: z.string().min(2, {
+    message: "Description must be at least 5 characters long.",
+  }),
 });
 
 
@@ -81,7 +81,7 @@ const Page = () => {
       form.reset(); 
     } catch (error) {
       console.error("Error adding document: ", error);
-      alert("Error submitting form. Please try again.");
+       console.log("Error submitting form. Please try again.");
     }
   };
 

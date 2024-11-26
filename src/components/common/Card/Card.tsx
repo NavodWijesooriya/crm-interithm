@@ -17,7 +17,7 @@ type Card = {
   customerName?: string;
   companyName?: string;
   email?: string;
-  mobileNumber?: string;
+  phoneNumber?: string;
   complainCategory?: string;
   description?: string;
   status?: string;
@@ -92,7 +92,7 @@ const Cards = () => {
         lastUpdated: serverTimestamp(),
         [`${status}By`]: user.email,
       });
-      // alert(`Task moved to ${status}!`);
+      console.log(`Task moved to ${status}!`);
     } catch (error) {
       console.error(`Error moving task to ${status}:`, error);
       alert(`Error moving task to ${status}.`);
@@ -198,7 +198,7 @@ const Cards = () => {
             <h3 className="text-2xl font-semibold text-gray-800 mb-4">{selectedCard.customerName}</h3>
             <p className="text-gray-600 mb-4"><strong>Company Name:</strong> {selectedCard.companyName}</p>
             <p className="text-gray-600 mb-4"><strong>Email:</strong> {selectedCard.email}</p>
-            <p className="text-gray-600 mb-4"><strong>Mobile Number:</strong> {selectedCard.mobileNumber}</p>
+            <p className="text-gray-600 mb-4"><strong>Phone Number:</strong> {selectedCard.phoneNumber}</p>
             <p className="text-gray-600 mb-4"><strong>Category:</strong> {selectedCard.complainCategory}</p>
             <p className="text-gray-600 mb-4"><strong>Description:</strong> {selectedCard.description}</p>
             <button

@@ -1,65 +1,19 @@
-"use client";
-
 import React, { useState, useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { serverTimestamp, updateDoc, doc, query, where, onSnapshot, collection } from "firebase/firestore";
 import { db, auth } from "@/app/firebase/config";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { format } from "date-fns";
-import {
-
-  query,
-  where,
-  onSnapshot,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 
-// Form Schema Validation
-const formSchema = z.object({
-  customerName: z.string().min(2, {
-    message: "Customer name must be at least 2 characters.",
-  }),
-  companyName: z.string().min(2, {
-    message: "Company name must be at least 2 characters.",
-  }),
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  phoneNumber: z
-    .string()
-    .regex(/^\+?[0-9]{1,14}$/, {
-      message: "Enter a valid phone number.",
-    }),
-  complainCategory: z.string().min(1, {
-    message: "Complain category is required.",
-  }),
-  description: z.string().min(2, {
-    message: "Description must be at least 5 characters long.",
-  }),
+const zodSchema = z.object({
+  customerName: z.string().min(2, { message: "Customer name must be at least 2 characters." }),
+  companyName: z.string().min(2, { message: "Company name must be at least 2 characters." }),
+  email: z.string().email({ message: "Please enter a valid email address." }),
+  phoneNumber: z.string().regex(/^\+?[0-9]{1,14}$/, { message: "Enter a valid phone number." }),
+  complainCategory: z.string().min(1, { message: "Complain category is required." }),
+  description: z.string().min(2, { message: "Description must be at least 5 characters long." }),
 });
-
-type FormData = {
-  customerName: string;
-  companyName: string;
-  email: string;
-  phoneNumber: string;
-  complainCategory: string;
-  description: string;
-};
 
 type Card = {
   id: string;
@@ -71,6 +25,9 @@ type Card = {
   description?: string;
   status?: string;
   createdAt?: any;
+  todoTime?: any;  
+  processingTime?: any;  
+  doneTime?: any; 
 };
 
 const Cards = () => {
@@ -81,7 +38,7 @@ const Cards = () => {
   const [doneCardData, setDoneCardData] = useState<Card[]>([]);
   const [user, loading] = useAuthState(auth);
   const router = useRouter();
-  
+
   const [showMoreTodo, setShowMoreTodo] = useState(false);
   const [showMoreProcessing, setShowMoreProcessing] = useState(false);
   const [showMoreDone, setShowMoreDone] = useState(false);
@@ -92,11 +49,9 @@ const Cards = () => {
     }
   }, [user, loading, router]);
 
-  const fetchData = (
-    status: string,
-    setState: React.Dispatch<React.SetStateAction<Card[]>>
-  ) => {
+  const fetchData = (status: string, setState: React.Dispatch<React.SetStateAction<Card[]>>) => {
     const q = query(collection(db, "customer_issues"), where("status", "==", status));
+
     return onSnapshot(q, (querySnapshot) => {
       const cards = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -135,12 +90,24 @@ const Cards = () => {
     const cardRef = doc(db, "customer_issues", card.id);
 
     try {
-      await updateDoc(cardRef, {
+      const updateData: { [key: string]: any } = {
         status,
-        [`${status}Time`]: serverTimestamp(),
         lastUpdated: serverTimestamp(),
         [`${status}By`]: user.email,
-      });
+      };
+
+      
+      if (status === "TODO") {
+        updateData.todoTime = serverTimestamp();
+      } else if (status === "processing") {
+        updateData.processingTime = serverTimestamp();
+      } else if (status === "done") {
+        updateData.doneTime = serverTimestamp();
+      }
+
+      
+      await updateDoc(cardRef, updateData);
+
       console.log(`Task moved to ${status}!`);
     } catch (error) {
       console.error(`Error moving task to ${status}:`, error);
@@ -148,14 +115,11 @@ const Cards = () => {
     }
   };
 
-  const renderCard = (
-    card: Card,
-    actionLabel: string,
-    actionHandler: (card: Card) => void
-  ) => {
-    const createdAtFormatted = card.createdAt
-      ? format(card.createdAt.toDate(), "Ppp")
-      : "N/A";
+  const renderCard = (card: Card, actionLabel: string, actionHandler: (card: Card) => void) => {
+    const createdAtFormatted = card.createdAt ? format(card.createdAt.toDate(), "Ppp") : "N/A";
+    const todoTimeFormatted = card.todoTime ? format(card.todoTime.toDate(), "Ppp") : "N/A";
+    const processingTimeFormatted = card.processingTime ? format(card.processingTime.toDate(), "Ppp") : "N/A";
+    const doneTimeFormatted = card.doneTime ? format(card.doneTime.toDate(), "Ppp") : "N/A";
 
     return (
       <div
@@ -165,7 +129,10 @@ const Cards = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
           <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
-          <p className="text-sm text-gray-500 mt-1"> {createdAtFormatted}</p>
+          <p className="text-sm text-gray-500 mt-1">Created At: {createdAtFormatted}</p>
+          {card.status === "processing" && <p className="text-sm text-gray-500 mt-1">Assigned At: {processingTimeFormatted}</p>}
+          {card.status === "TODO" && <p className="text-sm text-gray-500 mt-1">Added To To-Do At: {todoTimeFormatted}</p>}
+          {card.status === "done" && <p className="text-sm text-gray-500 mt-1">Completed At: {doneTimeFormatted}</p>}
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
           <button
@@ -176,9 +143,9 @@ const Cards = () => {
           </button>
           <button
             onClick={() => openModal(card)}
-            
+            className="bg-green-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-700 transition"
           >
-          
+            View Details
           </button>
         </div>
       </div>
@@ -206,7 +173,7 @@ const Cards = () => {
             </button>
           )}
         </div>
-        
+
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
           {processingCardsToDisplay.map((card) =>
@@ -224,9 +191,7 @@ const Cards = () => {
 
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
-          {doneCardsToDisplay.map((card) =>
-            renderCard(card, "View", openModal)
-          )}
+          {doneCardsToDisplay.map((card) => renderCard(card, "Done", () => {}))}
           {doneCardData.length > 4 && (
             <button
               onClick={() => setShowMoreDone(!showMoreDone)}
@@ -239,14 +204,17 @@ const Cards = () => {
       </div>
 
       {isModalOpen && selectedCard && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 shadow-2xl max-w-lg w-full">
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg w-11/12 sm:w-96">
             <h3 className="text-2xl font-semibold">{selectedCard.companyName}</h3>
-            <p>Name:   { selectedCard.customerName}</p>
-            <p>E-mail  { selectedCard.email}</p>
-            <p>Status:  { selectedCard.status}</p>
-            <p>Phone number:  { selectedCard.phoneNumber}</p>
-            <p>Description:   { selectedCard.description}</p>
+            <p>Customer Name: {selectedCard.customerName}</p>
+            <p>Email: {selectedCard.email}</p>
+            <p>Description: {selectedCard.description}</p>
+            <p>Status: {selectedCard.status}</p>
+            <p>Created At: {format(selectedCard.createdAt?.toDate(), "Ppp")}</p>
+            {selectedCard.todoTime && <p>Added to To-Do at: {format(selectedCard.todoTime.toDate(), "Ppp")}</p>}
+            {selectedCard.processingTime && <p>Assigned at: {format(selectedCard.processingTime.toDate(), "Ppp")}</p>}
+            {selectedCard.doneTime && <p>Completed at: {format(selectedCard.doneTime.toDate(), "Ppp")}</p>}
             <button
               onClick={closeModal}
               className="bg-red-600 text-white mt-4 px-4 py-2 rounded"

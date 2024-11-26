@@ -19,7 +19,7 @@ export default function SidebarPage() {
       <div>
       <div className="text-xl sm:text-xl lg:text-5xl font-extrabold mb-6 text-center  text-blue-600 tracking-wide drop-shadow-md p-3 m-3 font-roboto">
       <h1>
-  Customer Issues Tracker
+  Customer Issue Tracker
 </h1>
 
 

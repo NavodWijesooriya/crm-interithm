@@ -143,7 +143,7 @@ const Cards = () => {
 
           <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
           {todoCardsToDisplay.map((card) =>
-            renderCard(card, "Move", (c) => handleMove(c, "processing"))
+            renderCard(card, "Assign", (c) => handleMove(c, "processing"))
           )}
           {todoCardData.length > 4 && (
             <button
@@ -157,10 +157,10 @@ const Cards = () => {
 
         
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
-
+          
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
           {processingCardsToDisplay.map((card) =>
-            renderCard(card, "Move", (c) => handleMove(c, "done"))
+            renderCard(card, "Done", (c) => handleMove(c, "done"))
           )}
           {processingCardData.length > 4 && (
             <button

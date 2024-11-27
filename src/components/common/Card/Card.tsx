@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { z } from "zod";
+// import { z } from "zod";
 import { serverTimestamp, updateDoc, doc, query, where, onSnapshot, collection } from "firebase/firestore";
 import { db, auth } from "@/app/firebase/config";
 import { format } from "date-fns";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 
-const zodSchema = z.object({
-  customerName: z.string().min(2, { message: "Customer name must be at least 2 characters." }),
-  companyName: z.string().min(2, { message: "Company name must be at least 2 characters." }),
-  email: z.string().email({ message: "Please enter a valid email address." }),
-  phoneNumber: z.string().regex(/^\+?[0-9]{1,14}$/, { message: "Enter a valid phone number." }),
-  complainCategory: z.string().min(1, { message: "Complain category is required." }),
-  description: z.string().min(2, { message: "Description must be at least 5 characters long." }),
-});
+// const zodSchema = z.object({
+//   customerName: z.string().min(2, { message: "Customer name must be at least 2 characters." }),
+//   companyName: z.string().min(2, { message: "Company name must be at least 2 characters." }),
+//   email: z.string().email({ message: "Please enter a valid email address." }),
+//   phoneNumber: z.string().regex(/^\+?[0-9]{1,14}$/, { message: "Enter a valid phone number." }),
+//   complainCategory: z.string().min(1, { message: "Complain category is required." }),
+//   description: z.string().min(5, { message: "Description must be at least 5 characters long." }),
+// });
 
 type Card = {
   id: string;
@@ -25,9 +25,9 @@ type Card = {
   description?: string;
   status?: string;
   createdAt?: any;
-  todoTime?: any;  
-  processingTime?: any;  
-  doneTime?: any; 
+  todoTime?: any;
+  processingTime?: any;
+  doneTime?: any;
 };
 
 const Cards = () => {
@@ -84,8 +84,35 @@ const Cards = () => {
   };
 
   const handleMove = async (card: Card, status: string) => {
-    if (!user) return alert("You must be logged in to perform this action.");
-    if (!card.id) return;
+    if (!user) {
+      alert("You must be logged in to perform this action.");
+      return;
+    }
+    if (!card.id) {
+      alert("Card ID is missing.");
+      return;
+    }
+
+
+    if (status === "processing") {
+      const confirmAssign = window.confirm(
+        "Are you sure you want to assign this task for processing?"
+      );
+      if (!confirmAssign) return;
+    }
+
+    if (status === "done") {
+      const confirmCompletion = window.confirm(
+        "Are you sure this task is completed?"
+      );
+      if (!confirmCompletion) return;
+
+  
+      if (!card.processingTime) {
+        alert("This task cannot be marked as done because it was never assigned.");
+        return;
+      }
+    }
 
     const cardRef = doc(db, "customer_issues", card.id);
 
@@ -96,7 +123,6 @@ const Cards = () => {
         [`${status}By`]: user.email,
       };
 
-      
       if (status === "TODO") {
         updateData.todoTime = serverTimestamp();
       } else if (status === "processing") {
@@ -105,21 +131,27 @@ const Cards = () => {
         updateData.doneTime = serverTimestamp();
       }
 
-      
       await updateDoc(cardRef, updateData);
-
-      console.log(`Task moved to ${status}!`);
+      alert(`Task successfully moved to ${status}!`);
     } catch (error) {
       console.error(`Error moving task to ${status}:`, error);
       alert(`Error moving task to ${status}.`);
     }
   };
 
+  const safeFormatDate = (date: any) => {
+    try {
+      return date && date.toDate ? format(date.toDate(), "Ppp") : format(new Date(date), "Ppp");
+    } catch {
+      return "N/A";
+    }
+  };
+
   const renderCard = (card: Card, actionLabel: string, actionHandler: (card: Card) => void) => {
-    const createdAtFormatted = card.createdAt ? format(card.createdAt.toDate(), "Ppp") : "N/A";
-    const todoTimeFormatted = card.todoTime ? format(card.todoTime.toDate(), "Ppp") : "N/A";
-    const processingTimeFormatted = card.processingTime ? format(card.processingTime.toDate(), "Ppp") : "N/A";
-    const doneTimeFormatted = card.doneTime ? format(card.doneTime.toDate(), "Ppp") : "N/A";
+    const createdAtFormatted = safeFormatDate(card.createdAt);
+    const todoTimeFormatted = safeFormatDate(card.todoTime);
+    const processingTimeFormatted = safeFormatDate(card.processingTime);
+    const doneTimeFormatted = safeFormatDate(card.doneTime);
 
     return (
       <div
@@ -191,7 +223,9 @@ const Cards = () => {
 
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
-          {doneCardsToDisplay.map((card) => renderCard(card, "Done", () => {}))}
+          {doneCardsToDisplay.map((card) =>
+            renderCard(card, "Move To To-Do", (c) => handleMove(c, "TODO"))
+          )}
           {doneCardData.length > 4 && (
             <button
               onClick={() => setShowMoreDone(!showMoreDone)}
@@ -202,25 +236,13 @@ const Cards = () => {
           )}
         </div>
       </div>
-
       {isModalOpen && selectedCard && (
-        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-11/12 sm:w-96">
-            <h3 className="text-2xl font-semibold">{selectedCard.companyName}</h3>
-            <p>Customer Name: {selectedCard.customerName}</p>
-            <p>Email: {selectedCard.email}</p>
-            <p>Description: {selectedCard.description}</p>
-            <p>Status: {selectedCard.status}</p>
-            <p>Created At: {format(selectedCard.createdAt?.toDate(), "Ppp")}</p>
-            {selectedCard.todoTime && <p>Added to To-Do at: {format(selectedCard.todoTime.toDate(), "Ppp")}</p>}
-            {selectedCard.processingTime && <p>Assigned at: {format(selectedCard.processingTime.toDate(), "Ppp")}</p>}
-            {selectedCard.doneTime && <p>Completed at: {format(selectedCard.doneTime.toDate(), "Ppp")}</p>}
-            <button
-              onClick={closeModal}
-              className="bg-red-600 text-white mt-4 px-4 py-2 rounded"
-            >
-              Close
-            </button>
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="modal-header">Card Details</h2>
+            <p>{selectedCard?.customerName}</p>
+            <p>{selectedCard?.description}</p>
+            <button onClick={closeModal}>Close</button>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 // import { z } from "zod";
-import { serverTimestamp, updateDoc, doc, query, where, onSnapshot, collection } from "firebase/firestore";
+import { serverTimestamp, updateDoc, doc, query, where, onSnapshot, collection, Timestamp } from "firebase/firestore";
 import { db, auth } from "@/app/firebase/config";
 import { format } from "date-fns";
 import { useAuthState } from "react-firebase-hooks/auth";
@@ -15,7 +15,9 @@ import { useRouter } from "next/navigation";
 //   description: z.string().min(5, { message: "Description must be at least 5 characters long." }),
 // });
 
-type Card = {
+type Status = "TODO" | "processing" | "done"; // Restrict status to specific values
+
+interface Card {
   id: string;
   customerName?: string;
   companyName?: string;
@@ -23,12 +25,12 @@ type Card = {
   phoneNumber?: string;
   complainCategory?: string;
   description?: string;
-  status?: string;
-  createdAt?: any;
-  todoTime?: any;
-  processingTime?: any;
-  doneTime?: any;
-};
+  status?: Status;
+  createdAt?: Timestamp;
+  todoTime?: Timestamp;
+  processingTime?: Timestamp;
+  doneTime?: Timestamp;
+}
 
 const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,14 +51,14 @@ const Cards = () => {
     }
   }, [user, loading, router]);
 
-  const fetchData = (status: string, setState: React.Dispatch<React.SetStateAction<Card[]>>) => {
+  const fetchData = (status: Status, setState: React.Dispatch<React.SetStateAction<Card[]>>) => {
     const q = query(collection(db, "customer_issues"), where("status", "==", status));
 
     return onSnapshot(q, (querySnapshot) => {
       const cards = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
-      }));
+      })) as Card[];
       setState(cards);
     });
   };
@@ -83,7 +85,7 @@ const Cards = () => {
     setIsModalOpen(false);
   };
 
-  const handleMove = async (card: Card, status: string) => {
+  const handleMove = async (card: Card, status: Status) => {
     if (!user) {
       alert("You must be logged in to perform this action.");
       return;
@@ -93,21 +95,17 @@ const Cards = () => {
       return;
     }
 
-
+    // Confirmation before moving to processing or done
     if (status === "processing") {
-      const confirmAssign = window.confirm(
-        "Are you sure you want to assign this task for processing?"
-      );
+      const confirmAssign = window.confirm("Are you sure you want to assign this task for processing?");
       if (!confirmAssign) return;
     }
 
     if (status === "done") {
-      const confirmCompletion = window.confirm(
-        "Are you sure this task is completed?"
-      );
+      const confirmCompletion = window.confirm("Are you sure this task is completed?");
       if (!confirmCompletion) return;
 
-  
+      // Additional validation: Ensure processingTime is set before marking as done
       if (!card.processingTime) {
         alert("This task cannot be marked as done because it was never assigned.");
         return;
@@ -117,18 +115,18 @@ const Cards = () => {
     const cardRef = doc(db, "customer_issues", card.id);
 
     try {
-      const updateData: { [key: string]: any } = {
+      const updateData: { [key: string]: } = {
         status,
-        lastUpdated: serverTimestamp(),
+        lastUpdated: serverTimestamp() as Timestamp, // Use Timestamp for serverTimestamp()
         [`${status}By`]: user.email,
       };
 
       if (status === "TODO") {
-        updateData.todoTime = serverTimestamp();
+        updateData.todoTime = serverTimestamp() as Timestamp;
       } else if (status === "processing") {
-        updateData.processingTime = serverTimestamp();
+        updateData.processingTime = serverTimestamp() as Timestamp;
       } else if (status === "done") {
-        updateData.doneTime = serverTimestamp();
+        updateData.doneTime = serverTimestamp() as Timestamp; // Mark completion time
       }
 
       await updateDoc(cardRef, updateData);
@@ -139,9 +137,9 @@ const Cards = () => {
     }
   };
 
-  const safeFormatDate = (date: any) => {
+  const safeFormatDate = (date: Timestamp | undefined) => {
     try {
-      return date && date.toDate ? format(date.toDate(), "Ppp") : format(new Date(date), "Ppp");
+      return date ? format(date.toDate(), "Ppp") : "N/A";
     } catch {
       return "N/A";
     }
@@ -224,7 +222,7 @@ const Cards = () => {
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
           {doneCardsToDisplay.map((card) =>
-            renderCard(card, "Move To To-Do", (c) => handleMove(c, "TODO"))
+            renderCard(card, "Reopen", (c) => handleMove(c, "TODO"))
           )}
           {doneCardData.length > 4 && (
             <button
@@ -236,13 +234,27 @@ const Cards = () => {
           )}
         </div>
       </div>
+
       {isModalOpen && selectedCard && (
-        <div className="modal">
-          <div className="modal-content">
-            <h2 className="modal-header">Card Details</h2>
-            <p>{selectedCard?.customerName}</p>
-            <p>{selectedCard?.description}</p>
-            <button onClick={closeModal}>Close</button>
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-xl">
+            <h2 className="text-xl font-semibold text-gray-800">{selectedCard.companyName}</h2>
+            <div className="mt-4">
+              <p className="text-gray-700">Customer Name: {selectedCard.customerName}</p>
+              <p className="text-gray-700">Email: {selectedCard.email}</p>
+              <p className="text-gray-700">Phone Number: {selectedCard.phoneNumber}</p>
+              <p className="text-gray-700">Category: {selectedCard.complainCategory}</p>
+              <p className="text-gray-700">Description: {selectedCard.description}</p>
+              <p className="text-gray-700">Status: {selectedCard.status}</p>
+            </div>
+            <div className="flex justify-end gap-4 mt-4">
+              <button
+                onClick={closeModal}
+                className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

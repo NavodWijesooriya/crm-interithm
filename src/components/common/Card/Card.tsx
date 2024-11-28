@@ -151,7 +151,7 @@ const Cards = () => {
         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
           <button
             onClick={() => actionHandler(card)}
-            className="bg-blue-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-700 transition"
+            className="bg-blue-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-blue-500 transition"
           >
             {actionLabel}
           </button>
@@ -175,7 +175,7 @@ const Cards = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8">
         {/* To-Do Section */}
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
-          <h2 className="text-xl font-semibold text-blue-600 mb-6">To-Do</h2>
+          <h2 className="text-xl font-semibold text-blue-500 mb-6">To-Do</h2>
           {todoCardsToDisplay.map((card) =>
             renderCard(card, "Assign", (c) => handleMove(c, "processing"))
           )}

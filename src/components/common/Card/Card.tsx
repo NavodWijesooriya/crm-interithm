@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { serverTimestamp, updateDoc, doc, query, where, onSnapshot, collection, Timestamp } from "firebase/firestore";
 import { db, auth } from "@/app/firebase/config";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 
@@ -34,6 +34,7 @@ const Cards = () => {
   const [showMoreDone, setShowMoreDone] = useState(false);
 
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
 
   useEffect(() => {
     if (!loading && !user && !sessionStorage.getItem("user")) {
@@ -129,11 +130,17 @@ const Cards = () => {
     }
   };
 
+  const getProcessingToDoneTimeDifference = (processingTime: Timestamp | undefined, doneTime: Timestamp | undefined) => {
+    if (processingTime && doneTime) {
+      return formatDistanceToNow(doneTime.toDate()) + ` (${safeFormatDate(processingTime)})`;
+    }
+    return "N/A";
+  };
+
   const renderCard = (card: Card, actionLabel: string, actionHandler: (card: Card) => void) => {
-    const createdAtFormatted = safeFormatDate(card.createdAt);
-    const todoTimeFormatted = safeFormatDate(card.todoTime);
     const processingTimeFormatted = safeFormatDate(card.processingTime);
     const doneTimeFormatted = safeFormatDate(card.doneTime);
+    const timeDifference = getProcessingToDoneTimeDifference(card.processingTime, card.doneTime);
 
     return (
       <div
@@ -143,10 +150,15 @@ const Cards = () => {
         <div>
           <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
           <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
-          <p className="text-sm text-gray-500 mt-1">Created At: {createdAtFormatted}</p>
-          {card.status === "processing" && <p className="text-sm text-gray-500 mt-1">Assigned At: {processingTimeFormatted}</p>}
-          {card.status === "TODO" && <p className="text-sm text-gray-500 mt-1">Added To To-Do At: {todoTimeFormatted}</p>}
-          {card.status === "done" && <p className="text-sm text-gray-500 mt-1">Completed At: {doneTimeFormatted}</p>}
+          {card.status === "processing" && (
+            <p className="text-sm text-gray-500 mt-1">Assigned At: {processingTimeFormatted}</p>
+          )}
+          {card.status === "done" && (
+            <>
+              <p className="text-sm text-gray-500 mt-1">Completed At: {doneTimeFormatted}</p>
+              <p className="text-sm text-gray-500 mt-1">Time to Complete: {timeDifference}</p>
+            </>
+          )}
         </div>
         <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
           <button
@@ -156,7 +168,10 @@ const Cards = () => {
             {actionLabel}
           </button>
           <button
-            onClick={() => setSelectedCard(card)}
+            onClick={() => {
+              setSelectedCard(card); // Set the selected card
+              setIsModalOpen(true); // Open the modal
+            }}
             className="bg-green-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-500 transition"
           >
             View Details
@@ -169,6 +184,11 @@ const Cards = () => {
   const todoCardsToDisplay = showMoreTodo ? todoCardData : todoCardData.slice(0, 3);
   const processingCardsToDisplay = showMoreProcessing ? processingCardData : processingCardData.slice(0, 3);
   const doneCardsToDisplay = showMoreDone ? doneCardData : doneCardData.slice(0, 3);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedCard(null); // Reset the selected card when closing the modal
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -207,36 +227,8 @@ const Cards = () => {
 
         {/* Done Section */}
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
-          <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
-          {doneCardsToDisplay.map((card) => (
-            <div
-              key={card.id}
-              className="bg-white w-80 h-100 flex flex-col justify-between p-4 rounded-lg shadow-lg hover:shadow-2xl transition-all transform hover:scale-100 mb-8 border border-gray-300"
-            >
-              <div>
-                <h3 className="text-lg font-semibold text-gray-800">{card.companyName}</h3>
-                <p className="text-gray-600 mt-2 line-clamp-4">{card.complainCategory}</p>
-                <p className="text-sm text-gray-500 mt-1">Created At: {safeFormatDate(card.createdAt)}</p>
-                {card.status === "done" && (
-                  <p className="text-sm text-gray-500 mt-1">Completed At: {safeFormatDate(card.doneTime)}</p>
-                )}
-              </div>
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-2 mt-4">
-                <button
-                  className="bg-blue-500 text-white px-4 py-2 text-sm rounded-lg cursor-not-allowed"
-                  disabled
-                >
-                  Completed
-                </button>
-                <button
-                  onClick={() => setSelectedCard(card)}
-                  className="bg-green-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-500 transition"
-                >
-                  View Details
-                </button>
-              </div>
-            </div>
-          ))}
+          <h2 className="text-xl font-semibold text-green-600 mb-6">Done</h2>
+          {doneCardsToDisplay.map((card) => renderCard(card, "", () => {}))}
           {doneCardData.length > 4 && (
             <button
               onClick={() => setShowMoreDone(!showMoreDone)}
@@ -248,25 +240,32 @@ const Cards = () => {
         </div>
       </div>
 
-      {/* Details Modal */}
-      {selectedCard && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg w-96 shadow-xl">
-            <h3 className="text-2xl font-semibold mb-4">{selectedCard.companyName}</h3>
+      {/* Popup Modal */}
+      {isModalOpen && selectedCard && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+          onClick={closeModal}
+        >
+          <div
+            className="bg-white rounded-lg shadow-lg p-8 max-w-lg w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-2xl font-semibold text-blue-600 mb-4">Customer Details</h3>
             <p><strong>Customer Name:</strong> {selectedCard.customerName}</p>
+            <p><strong>Company Name:</strong> {selectedCard.companyName}</p>
             <p><strong>Email:</strong> {selectedCard.email}</p>
             <p><strong>Phone Number:</strong> {selectedCard.phoneNumber}</p>
+            <p><strong>Complaint Category:</strong> {selectedCard.complainCategory}</p>
             <p><strong>Description:</strong> {selectedCard.description}</p>
-            <p><strong>Category:</strong> {selectedCard.complainCategory}</p>
             <p><strong>Created At:</strong> {safeFormatDate(selectedCard.createdAt)}</p>
-            <div className="mt-4">
-              <button
-                onClick={() => setSelectedCard(null)}
-                className="bg-red-600 text-white px-4 py-2 text-sm rounded-lg hover:bg-red-700"
-              >
-                Close
-              </button>
-            </div>
+
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

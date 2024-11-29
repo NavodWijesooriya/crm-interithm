@@ -1,57 +1,91 @@
 'use client'
 
 import React, { useState, useEffect } from "react";
-import { db } from "@/app/firebase/config"; 
-import { collection, getDocs } from "firebase/firestore";
+import { collection, query, onSnapshot, Timestamp } from "firebase/firestore";
+import { db } from "@/app/firebase/config";
+import { format } from "date-fns";
 
-const CalculatePage = () => {
-  const [tableData, setTableData] = useState<any[]>([]);
+interface Card {
+  id: string;
+  customerName?: string;
+  companyName?: string;
+  complainCategory?: string;
+  status?: string;
+  createdAt?: Timestamp; // Use Firestore Timestamp type
+  processingTime?: Timestamp; // Use Firestore Timestamp type
+  doneTime?: Timestamp; // Use Firestore Timestamp type
+  processingBy?: string;
+  doneBy?: string;
+}
+
+const Table = () => {
+  const [cardData, setCardData] = useState<Card[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "customer_issues"));
-        const data = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setTableData(data);
-      } catch (error) {
-        console.error("Error fetching Firestore data:", error);
-      }
-    };
+    const q = query(collection(db, "customer_issues"));
 
-    fetchData();
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Card[];
+      setCardData(data);
+    });
+
+    return () => unsubscribe();
   }, []);
 
+  const safeFormatDate = (timestamp: Timestamp | undefined) => {
+    try {
+      return timestamp ? format(timestamp.toDate(), "Ppp") : "N/A";
+    } catch {
+      return "N/A";
+    }
+  };
+
   return (
-    <div className="p-4 bg-gray-100 min-h-screen flex flex-col items-center justify-start">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center">Calculate</h1>
-      <table className="table-auto w-3/4 bg-white shadow-xl rounded-lg overflow-hidden border border-gray-300 text-base">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="px-8 py-4 text-left text-gray-800 font-medium">User</th>
-            <th className="px-8 py-4 text-left text-gray-800 font-medium">Email</th>
-            <th className="px-8 py-4 text-left text-gray-800 font-medium">Processing Time</th>
-            <th className="px-8 py-4 text-left text-gray-800 font-medium">Pay</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tableData.map((row, index) => (
-            <tr
-              key={index}
-              className={index % 2 === 0 ? 'bg-white hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100'}
-            >
-              <td className="px-8 py-4 text-gray-900">{row.customerName || "N/A"}</td>
-              <td className="px-8 py-4 text-gray-700">{row.email || "N/A"}</td>
-              <td className="px-8 py-4 text-gray-700">{row.processingTime || "N/A"}</td>
-              <td className="px-8 py-4 text-gray-700">{row.pay || "N/A"}</td>
+    <div className="container mx-auto p-6">
+      <h1 className="text-4xl font-extrabold text-blue-700 mb-8 text-center tracking-wide leading-tight py-4 px-6 bg-gray-100 rounded-lg shadow-lg font-roboto">
+        Report
+      </h1>
+
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full border-collapse border border-gray-300 shadow-md rounded-lg">
+          <thead className="bg-gray-400 text-white">
+            <tr>
+              <th className="px-6 py-3 text-left">Customer Name</th>
+              <th className="px-6 py-3 text-left">Company Name</th>
+              <th className="px-6 py-3 text-left">Category</th>
+              <th className="px-6 py-3 text-left">Status</th>
+              <th className="px-6 py-3 text-left">Created At</th>
+              <th className="px-6 py-3 text-left">Processing Time</th>
+              <th className="px-6 py-3 text-left">Processing By</th>
+              <th className="px-6 py-3 text-left">Done Time</th>
+              <th className="px-6 py-3 text-left">Done By</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {cardData.map((card, index) => (
+              <tr
+                key={card.id}
+                className={`border-b border-gray-200 ${index % 2 === 0 ? "bg-gray-50" : "bg-white"} hover:bg-gray-100 transition-all`}
+              >
+                <td className="px-6 py-4">{card.customerName || "N/A"}</td>
+                <td className="px-6 py-4">{card.companyName || "N/A"}</td>
+                <td className="px-6 py-4">{card.complainCategory || "N/A"}</td>
+                <td className="px-6 py-4">{card.status || "N/A"}</td>
+                <td className="px-6 py-4">{safeFormatDate(card.createdAt)}</td>
+                <td className="px-6 py-4">{safeFormatDate(card.processingTime)}</td>
+                <td className="px-6 py-4">{card.processingBy || "N/A"}</td>
+                <td className="px-6 py-4">{safeFormatDate(card.doneTime)}</td>
+                <td className="px-6 py-4">{card.doneBy || "N/A"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
 
-export default CalculatePage;
+export default Table;

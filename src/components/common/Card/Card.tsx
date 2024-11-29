@@ -5,6 +5,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 
+
 type Status = "TODO" | "processing" | "done"; 
 
 interface Card {  
@@ -34,7 +35,7 @@ const Cards = () => {
   const [showMoreDone, setShowMoreDone] = useState(false);
 
   const [selectedCard, setSelectedCard] = useState<Card | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
+  const [isModalOpen, setIsModalOpen] = useState(false); 
 
   useEffect(() => {
     if (!loading && !user && !sessionStorage.getItem("user")) {
@@ -169,12 +170,12 @@ const Cards = () => {
           </button>
           <button
             onClick={() => {
-              setSelectedCard(card); // Set the selected card
-              setIsModalOpen(true); // Open the modal
+              setSelectedCard(card);
+              setIsModalOpen(true); 
             }}
             className="bg-green-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-green-500 transition"
           >
-            View Details
+            View
           </button>
         </div> 
       </div>
@@ -187,13 +188,13 @@ const Cards = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedCard(null); // Reset the selected card when closing the modal
+    setSelectedCard(null); 
   };
 
   return (
     <div className="container mx-auto p-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 gap-y-8">
-        {/* To-Do Section */}
+      {/* TODO */}
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
           <h2 className="text-xl font-semibold text-blue-500 mb-6">To-Do</h2>
           {todoCardsToDisplay.map((card) =>
@@ -209,7 +210,7 @@ const Cards = () => {
           )}
         </div>
 
-        {/* Processing Section */}
+        {/* Processing*/}
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
           <h2 className="text-xl font-semibold text-blue-600 mb-6">Processing</h2>
           {processingCardsToDisplay.map((card) =>
@@ -225,14 +226,14 @@ const Cards = () => {
           )}
         </div>
 
-        {/* Done Section */}
+        {/* Done*/}
         <div className="border border-gray-300 rounded-lg p-12 shadow-xl">
-          <h2 className="text-xl font-semibold text-green-600 mb-6">Done</h2>
+          <h2 className="text-xl font-semibold text-blue-600 mb-6">Done</h2>
           {doneCardsToDisplay.map((card) => renderCard(card, "", () => {}))}
           {doneCardData.length > 4 && (
             <button
               onClick={() => setShowMoreDone(!showMoreDone)}
-              className="text-blue-600 mt-4"
+              
             >
               {showMoreDone ? "Show Less" : "Show More"}
             </button>
@@ -259,7 +260,7 @@ const Cards = () => {
             <p><strong>Description:</strong> {selectedCard.description}</p>
             <p><strong>Created At:</strong> {safeFormatDate(selectedCard.createdAt)}</p>
 
-            {/* Close Button */}
+          
             <button
               onClick={closeModal}
               className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg"
@@ -269,6 +270,9 @@ const Cards = () => {
           </div>
         </div>
       )}
+
+
+
     </div>
   );
 };

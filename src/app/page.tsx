@@ -2,6 +2,8 @@
 import { AppSidebar } from "../components/common/Sidebar/Appsidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import Card from "../components/common/Card/Card";
+import Link from "next/link";
+
 // import { useAuthState } from 'react-firebase-hooks/auth'
 // import { auth } from '@/app/firebase/config'
 // import { useRouter } from 'next/navigation';
@@ -49,6 +51,14 @@ export default function SidebarPage() {
 <h1 className="flex  justify-self-start">Todo</h1>
 
 </div> */}
+
+
+<div className="flex justify-end items-end fixed bottom-4 right-4">
+  <Link href="/report" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+    View Report
+  </Link>
+</div>
+
 
 
       </div>

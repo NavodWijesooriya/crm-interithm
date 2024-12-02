@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { query, onSnapshot, collection } from "firebase/firestore";
 import { db } from "@/app/firebase/config";
 import { format } from "date-fns";
+import Link from "next/link";
 
 interface Task {
   id: string;
@@ -130,6 +131,11 @@ const DoneTasksByUser = () => {
       ) : (
         <p>No completed tasks available.</p>
       )}
+
+<button className="bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-blue-600 hover:shadow-lg transition duration-300">
+  <Link href="/">Back</Link>
+</button>
+
     </div>
   );
 };

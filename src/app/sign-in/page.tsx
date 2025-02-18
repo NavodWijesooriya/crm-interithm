@@ -59,7 +59,7 @@ const SignIn = () => {
     <div className="bg-white">
       <section className="text-gray-600 body-font h-screen flex justify-center items-center bg-white">
         <div className="container px-5 py-24 mx-auto flex flex-wrap items-center justify-center">
-          <div className="lg:w-2/6 md:w-1/2 bg-white rounded-lg p-8 flex flex-col w-full shadow-lg transform transition duration-300 hover:scale-105 hover:shadow-2xl">
+          <div className="lg:w-2/6 md:w-1/2 bg-white rounded-lg p-8 flex flex-col w-full shadow-lg transform transition duration-300">
             <h2 className="text-gray-900 text-2xl font-bold text-center mb-6">Sign In</h2>
 
             <div className="relative mb-4">
@@ -92,7 +92,7 @@ const SignIn = () => {
 
             <button
               onClick={handleSignIn}
-              className="text-white bg-indigo-600 hover:bg-indigo-700 border-0 py-2 px-6 focus:outline-none rounded-md text-lg w-full mb-4 transform transition duration-300 hover:scale-105"
+              className="text-white bg-indigo-600  border-0 py-2 px-6 focus:outline-none rounded-md text-lg w-full mb-4 transform transition duration-300"
               disabled={loading}
             >
               {loading ? 'signing In...' : 'sign In'}
